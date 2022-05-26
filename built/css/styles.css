@@ -1,0 +1,116 @@
+@import url(./module.css);
+@import url('https://fonts.googleapis.com/css2?family=Merriweather&display=swap');
+
+* {
+    font-family: 'Merriweather', serif;
+    font-weight: 500;
+
+    --bright-filter: #a2a2a219;
+    --light-filter: #00000064;
+    --dark-filter: #0000007d;
+    --border-filter: #000000aa;
+}
+
+html {
+    width: 98%;
+    height: 98%;
+}
+
+body {
+    background-color: #2667ff;
+    width: 100%;
+    height: 100%;
+}
+
+#main-wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    color: white;
+}
+
+.module-line {
+    width: fit-content;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+#module-display {
+    display: flex;
+}
+
+/*#region Storage*/
+
+#tooltip {
+    border: var(--dark-filter) 3px solid;
+    border-top-right-radius: 15px;
+    border-bottom-left-radius: 15px;
+    height: fit-content;
+    width: fit-content;
+    display: none;
+    position: absolute;
+}
+
+.tooltip-name {
+    margin: 0;
+    padding: 10px;
+    background-color: var(--light-filter);
+    border-top-right-radius: 11px;
+    border-bottom-left-radius: 11px;
+}
+
+/*#endregion*/
+
+/*#region Storage*/
+
+.items-display {
+    width: 300px;
+    height: 100%;
+    border: var(--dark-filter) 3px solid;
+    border-top-right-radius: 15px;
+    border-bottom-left-radius: 15px;
+    margin-right: 15px;
+}
+
+/*#endregion*/
+
+/*#region Buttons*/
+
+.button {
+    background-color: var(--light-filter);
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: var(--bright-filter);
+    transition: 400ms;
+}
+
+.button-title {
+    text-align: center;
+    margin: 7px 0 7px 0;
+}
+
+.module-button {
+    width: 95%;
+    margin: 10px 0 10px 0;
+    border-top-right-radius: 12px;
+    border-bottom-left-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.square-button {
+    border: var(--dark-filter) 4px solid;
+    border-top-right-radius: 7px;
+    border-bottom-left-radius: 7px;
+    height: fit-content;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+
+}
+
+/*#endregion*/

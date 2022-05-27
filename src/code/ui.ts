@@ -1,5 +1,5 @@
 import { Conversion } from "./conversions"
-import { Item, ItemRef } from "./items/items"
+import { Item, ItemRef } from "./data/items"
 import { Module, ModuleButton } from "./module"
 
 export function itemIcon(item: Item | ItemRef, parent: UIComponent | JQuery) {
@@ -70,9 +70,14 @@ export class UIComponent {
         //Add an item icon to the UIC for each input. If there are no inputs, hide the box and arrow.
         if (con.inputs.length > 0) {
             con.inputs.forEach(inp => {
-                itemIcon(inp, this)
+                const iconText = itemIcon(inp, this)
                     .appendTo(comp.find(".conversion-items[inputs]"))
                     .addClass("negative")
+                    .find('.conversion-amount')
+
+                inp.on("modifierChange", (total) => {
+                    iconText.text(total)
+                })
             })
         }
         else {
@@ -90,9 +95,14 @@ export class UIComponent {
         //Same for outputs.
         if (con.outputs.length > 0) {
             con.outputs.forEach(out => {
-                itemIcon(out, this)
+                const iconText = itemIcon(out, this)
                     .appendTo(comp.find(".conversion-items[outputs]"))
                     .addClass("positive")
+                    .find('.conversion-amount')
+
+                out.on("modifierChange", (total) => {
+                    iconText.text(total)
+                })
             })
         }
         else {
@@ -127,8 +137,18 @@ export class UIComponent {
 
         comp.on("click", () => {
             button.cost.checkConversion(() => {
-                console.log(button.transform)
-                if (button.type === "build") button.cost.amount++
+                if (button.type === "build") {
+                    module.conversions.forEach(con => {
+                        con.amount++
+                    })
+                }
+                else if (button.type === "buildIncreaseAmount") {
+                    module.conversions.forEach(con => {
+                        con.amount++
+                    })
+                    button.cost.amount++
+                }
+
                 if (button.transform) module.transform(button.transform)
             })
         })
@@ -139,6 +159,7 @@ export class UIComponent {
 }
 
 export class ModuleLine extends UIComponent {
+    children: UIComponent[] = []
     constructor(public element: JQuery) { super(element) }
     //<p class="square-button button"><i class="fa-solid fa-minus"></i></p>
     //<p class="square-button button"><i class="fa-solid fa-plus"></i></p>
@@ -159,18 +180,35 @@ export class ModuleLine extends UIComponent {
         const uic = new UIComponent(comp)
         uic.parent = this
         this.element.append(comp)
-        comp.after(/*html*/` <p class="module-connector">|</p>`)
+        if (this.children.length > 0) comp.before(/*html*/` <p class="module-connector">|</p>`)
         mod.conversions.forEach(con => {
             uic.conversionBox(con)
         })
 
+        if (mod.buttons.length > 0) {
+            mod.buttons.forEach(but => {
+                uic.moduleButton(but, mod)
+            })
+        }
+
         mod.onTransform.listen(() => {
-            console.log(`On Transform`)
             comp.find(`.module-name-text`).text(mod.name)
             comp.find(`.module-description`).text(mod.description)
+
+            comp.find(`.conversion-wrapper`).remove()
+            mod.conversions.forEach(con => {
+                uic.conversionBox(con)
+            })
+
+            comp.find(`.module-button`).remove()
+            if (mod.buttons.length > 0) {
+                mod.buttons.forEach(but => {
+                    uic.moduleButton(but, mod)
+                })
+            }
         })
 
-        if (mod.button) uic.moduleButton(mod.button, mod)
+        this.children.push(uic)
         return uic
     }
 }

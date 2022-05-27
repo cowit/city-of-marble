@@ -1,3 +1,5 @@
+import { ModifiableVariable, ModifierReference } from "../modifiers.js"
+import { Module } from "../module.js"
 import { itemIcon } from "../ui.js"
 
 export class Item {
@@ -5,20 +7,13 @@ export class Item {
     protected _amount: number = 0
     public capacity: number = 0
     protected capacities = new Map<string, Capacity>()
-    //protected modifiers = new Map<string, ((items: Items) => void)>()
+    public module?: Module
 
     //Events
-    private listeners = new Map<string, ((newAmount: number, item: Item) => void)[]>()
+    protected listeners = new Map<string, ((newAmount: number, item: Item) => void)[]>()
 
     constructor(public id: string, public name: string, public icon: string) { }
 
-    /*
-    activate(items: Items) {
-        this.modifiers.forEach(mod => {
-            mod(items)
-        })
-    }
-*/
     checkAmount(divisor?: number) {
         //If a divisor is passed, divide the number by that amount. Else return the amount.
         if (divisor) {
@@ -47,17 +42,11 @@ export class Item {
         return this
     }
 
-    on(eventType: "amountChange", callback: ((newAmount: number, item: Item) => void)) {
+    on(eventType: "amountChange" | "totalChange" | "modifierChange", callback: ((newAmount: number, item: Item) => void)) {
         var eventArray = this.listeners.get(eventType)
         if (!eventArray) this.listeners.set(eventType, [callback])
         else eventArray.push(callback)
     }
-
-    /*
-    addModifier(modName: string, mod: ((items: Items) => void)) {
-        this.modifiers.set(modName, mod)
-    }
-    */
 
     addCapacity(capItem: Item, multiplier: number = 1) {
         this.capacities.set(capItem.id, new Capacity(this, capItem, multiplier))
@@ -66,9 +55,26 @@ export class Item {
 }
 
 export class ItemRef extends Item {
-    constructor(public item: Item, refAmount: number) {
+    totalVar?: ModifiableVariable<number | string>
+    constructor(public item: Item, refAmount: number, public modifiers?: ModifierReference[], public dontConsume: boolean = false) {
         super(item.id, item.name, item.icon)
         this._amount = refAmount
+        if (modifiers && modifiers.length > 0) {
+            modifiers.forEach((mod) => {
+                this.totalVar = game.currentPlanet().globalModifiers.subscribe(mod, this._amount)
+            })
+            this.totalVar?.onModifierChange.listen(() => {
+                this.listeners.get("modifierChange")?.forEach(
+                    (callback) => { callback(this.total(), this) })
+            })
+        }
+    }
+
+    total(): number {
+        if (this.totalVar) {
+            return this.totalVar.totalNumber
+        }
+        else return this._amount
     }
 }
 
@@ -97,10 +103,10 @@ function itemAccessor(id: string, name: string) {
 
     //Quick access function which allows to quickly get the Item or an Itemref using a number.
     function quickAccess(): Item
-    function quickAccess(refAmount?: number): ItemRef
-    function quickAccess(refAmount?: number): Item | ItemRef {
+    function quickAccess(refAmount?: number, modifiers?: ModifierReference[], dontConsume?: boolean): ItemRef
+    function quickAccess(refAmount?: number, modifiers?: ModifierReference[], dontConsume: boolean = false): Item | ItemRef {
         if (refAmount) {
-            return new ItemRef(item, refAmount)
+            return new ItemRef(item, refAmount, modifiers, dontConsume)
         }
         else return item
     }
@@ -112,11 +118,11 @@ export class Items {
     housing = itemAccessor("housing", "Housing")
     population = itemAccessor("population", "Population")
     workForce = itemAccessor("workForce", "Work Force")
-    unexploredLand =itemAccessor("unexploredLand", "Unexplored Land")
+    unexploredLand = itemAccessor("unexploredLand", "Unexplored Land")
     land = itemAccessor("land", "Land")
+    localWater = itemAccessor("localWater", "Local Water")
 
     constructor() {
-        this.housing().addCapacity(this.land())
         this.population().addCapacity(this.housing(), 5)
         this.workForce().addCapacity(this.population())
     }

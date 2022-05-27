@@ -1,5 +1,6 @@
 import { UIComponent } from "./ui.js";
-import { Items } from "./items/items.js";
+import { Items } from "./data/items.js";
+import { ModifierHandler } from "./modifiers.js";
 export class Planet {
     constructor(name) {
         this.name = name;
@@ -7,12 +8,13 @@ export class Planet {
         this.modules = [];
         this.lines = new Map();
         this.moduleContainer = new UIComponent($(`#module-display`));
+        this.globalModifiers = new ModifierHandler();
     }
     activate() {
         this.modules.forEach(mod => { mod.activate(this); });
     }
     addModuleLine(createModEx) {
-        const modEx = createModEx(this.items);
+        const modEx = createModEx(this.items, this.globalModifiers);
         let line = this.lines.get(modEx.id);
         if (!line) {
             line = this.moduleContainer.moduleLine();

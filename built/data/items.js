@@ -8,17 +8,9 @@ export class Item {
         this._amount = 0;
         this.capacity = 0;
         this.capacities = new Map();
-        //protected modifiers = new Map<string, ((items: Items) => void)>()
         //Events
         this.listeners = new Map();
     }
-    /*
-    activate(items: Items) {
-        this.modifiers.forEach(mod => {
-            mod(items)
-        })
-    }
-*/
     checkAmount(divisor) {
         //If a divisor is passed, divide the number by that amount. Else return the amount.
         if (divisor) {
@@ -53,21 +45,35 @@ export class Item {
         else
             eventArray.push(callback);
     }
-    /*
-    addModifier(modName: string, mod: ((items: Items) => void)) {
-        this.modifiers.set(modName, mod)
-    }
-    */
     addCapacity(capItem, multiplier = 1) {
         this.capacities.set(capItem.id, new Capacity(this, capItem, multiplier));
         return this;
     }
 }
 export class ItemRef extends Item {
-    constructor(item, refAmount) {
+    constructor(item, refAmount, modifiers, dontConsume = false) {
+        var _a;
         super(item.id, item.name, item.icon);
         this.item = item;
+        this.modifiers = modifiers;
+        this.dontConsume = dontConsume;
         this._amount = refAmount;
+        if (modifiers && modifiers.length > 0) {
+            modifiers.forEach((mod) => {
+                this.totalVar = game.currentPlanet().globalModifiers.subscribe(mod, this._amount);
+            });
+            (_a = this.totalVar) === null || _a === void 0 ? void 0 : _a.onModifierChange.listen(() => {
+                var _a;
+                (_a = this.listeners.get("modifierChange")) === null || _a === void 0 ? void 0 : _a.forEach((callback) => { callback(this.total(), this); });
+            });
+        }
+    }
+    total() {
+        if (this.totalVar) {
+            return this.totalVar.totalNumber;
+        }
+        else
+            return this._amount;
     }
 }
 class Capacity {
@@ -92,9 +98,9 @@ function itemAccessor(id, name) {
     if ($(`#${id}-display`).length === 0) {
         itemIcon(item, $(".items-display"));
     }
-    function quickAccess(refAmount) {
+    function quickAccess(refAmount, modifiers, dontConsume = false) {
         if (refAmount) {
-            return new ItemRef(item, refAmount);
+            return new ItemRef(item, refAmount, modifiers, dontConsume);
         }
         else
             return item;
@@ -109,6 +115,7 @@ export class Items {
         this.workForce = itemAccessor("workForce", "Work Force");
         this.unexploredLand = itemAccessor("unexploredLand", "Unexplored Land");
         this.land = itemAccessor("land", "Land");
+        this.localWater = itemAccessor("localWater", "Local Water");
         this.population().addCapacity(this.housing(), 5);
         this.workForce().addCapacity(this.population());
     }

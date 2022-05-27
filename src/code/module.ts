@@ -1,13 +1,15 @@
 import { EventHandler } from "./components/events.js";
+import { ModifierHandler } from "./modifiers.js";
 import { Conversion } from "./conversions.js";
-import { Items } from "./items/items.js";
+import { Items } from "./data/items.js";
 import { Planet } from "./planet.js";
+
 
 export class ModuleArguments {
     private _id?: string
     private _name?: string
     private _conversions: Conversion[] = []
-    private _button?: ModuleButton
+    private _buttons: ModuleButton[] = []
     private _description: string = ""
     private _transforms = new Map<string, ModuleArguments>()
     id(id: string) {
@@ -30,8 +32,8 @@ export class ModuleArguments {
         return this
     }
 
-    button(type: "build" | "trigger", title: string, cost: Conversion, transform?: string) {
-        this._button = new ModuleButton(type, title, cost, transform)
+    button(type: "build" | "trigger" | "buildIncreaseAmount", title: string, cost: Conversion, transform?: string) {
+        this._buttons.push(new ModuleButton(type, title, cost, transform))
         return this
     }
 
@@ -45,7 +47,18 @@ export class ModuleArguments {
         const mod = (items: Items) => {
             if (!this._id) throw new Error(`A Module Does not have an ID assigned to it.`)
             if (!this._name) throw new Error(`Module ${this._id} does not have a Name assigned to it.`)
-            return new Module(items, this._id, this._name, this._description, this._conversions, this._transforms, this._button)
+            const module = new Module(items,
+                this._id,
+                this._name,
+                this._description,
+                this._conversions, this._transforms,
+                this._buttons)
+            //Inject the module into all items/itemrefs so that they can use it's modifiers.
+            module.conversions.forEach(con => {
+                con.inputs.forEach(inp => { inp.module = module })
+                con.outputs.forEach(out => { out.module = module })
+            })
+            return module
         }
         return mod.bind(this)
 
@@ -54,7 +67,7 @@ export class ModuleArguments {
 
 export class ModuleButton {
     constructor(
-        public type: "build" | "trigger",
+        public type: "build" | "trigger" | "buildIncreaseAmount",
         public title: string,
         public cost: Conversion,
         public transform?: string
@@ -69,6 +82,8 @@ export function module() {
 export class Module {
     //Event handler which is triggered when the transform method is complete.
     onTransform = new EventHandler<Module>()
+    //Modifier handler which allows accessing and setting modifiers at different points.
+    modifiers = new ModifierHandler<number | string>()
     constructor(
         public items: Items,
         public id: string,
@@ -76,7 +91,7 @@ export class Module {
         public description: string,
         public conversions: Conversion[],
         public transforms: Map<string, ModuleArguments>, //A map of module arguments which can be completed and overwrite this module.
-        public button?: ModuleButton
+        public buttons: ModuleButton[] = []
     ) { }
 
     //Called on each activation cycle
@@ -94,7 +109,7 @@ export class Module {
 
         //Check that it pulls one that exists.
         if (transform) {
-            const { onTransform, ...transformExcluded } = transform
+            const { onTransform, id, ...transformExcluded } = transform
             Object.assign(this, transformExcluded)
             this.onTransform.trigger(this)
         }
@@ -106,3 +121,4 @@ export class Module {
 export class ModuleExporter {
     constructor(public id: string, public modArray: ((items: Items) => Module)[]) { }
 }
+

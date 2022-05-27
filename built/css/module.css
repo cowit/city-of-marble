@@ -35,6 +35,7 @@
     margin: 0;
     padding: 35px 12px 35px 12px;
     text-align: center;
+    white-space: pre-line;
 }
 
 .module-connector {

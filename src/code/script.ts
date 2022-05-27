@@ -1,18 +1,24 @@
 import { Game } from "./game.js";
 import { foraging } from "./modules/food.js";
 import { territory } from "./modules/territory.js";
-const game = new Game()
-const earth = game.createPlanet("Earth")
-earth.addModuleLine(territory)
-earth.addModuleLine(foraging)
-earth.items.unexploredLand().amount(100)
-
+globalThis.game = new Game()
 declare global {
     var tooltip: {
         display(event: JQuery.MouseMoveEvent | JQuery.MouseEnterEvent, text: string): void,
         hide(): void
     }
+    var game: Game
 }
+const earth = game.createPlanet("Earth")
+earth.addModuleLine(territory)
+earth.addModuleLine(foraging)
+earth.items.unexploredLand().amount(100)
+earth.items.land().amount(100)
+earth.items.housing().amount(100)
+earth.items.population().amount(100)
+earth.items.workForce().amount(100)
+
+
 
 const tooltipEle = $(`#tooltip`)
 const tooltipName = $(`.tooltip-name`)
@@ -26,4 +32,5 @@ globalThis.tooltip = {
     },
     hide() { tooltipEle.hide() }
 }
+
 setInterval(game.activate.bind(game), 1000)

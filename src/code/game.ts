@@ -11,6 +11,9 @@ export class Game {
 
     activate() {
         this.planets.forEach(pla => { pla.activate() })
+    }
 
+    currentPlanet() {
+        return this.planets[0]
     }
 }

@@ -10,9 +10,11 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 import { EventHandler } from "./components/events.js";
+import { ModifierHandler } from "./modifiers.js";
 export class ModuleArguments {
     constructor() {
         this._conversions = [];
+        this._buttons = [];
         this._description = "";
         this._transforms = new Map();
     }
@@ -33,7 +35,7 @@ export class ModuleArguments {
         return this;
     }
     button(type, title, cost, transform) {
-        this._button = new ModuleButton(type, title, cost, transform);
+        this._buttons.push(new ModuleButton(type, title, cost, transform));
         return this;
     }
     transform(id, transform) {
@@ -47,7 +49,13 @@ export class ModuleArguments {
                 throw new Error(`A Module Does not have an ID assigned to it.`);
             if (!this._name)
                 throw new Error(`Module ${this._id} does not have a Name assigned to it.`);
-            return new Module(items, this._id, this._name, this._description, this._conversions, this._transforms, this._button);
+            const module = new Module(items, this._id, this._name, this._description, this._conversions, this._transforms, this._buttons);
+            //Inject the module into all items/itemrefs so that they can use it's modifiers.
+            module.conversions.forEach(con => {
+                con.inputs.forEach(inp => { inp.module = module; });
+                con.outputs.forEach(out => { out.module = module; });
+            });
+            return module;
         };
         return mod.bind(this);
     }
@@ -66,16 +74,18 @@ export function module() {
 //The module is what the base interface which interacts with the planet.
 export class Module {
     constructor(items, id, name, description, conversions, transforms, //A map of module arguments which can be completed and overwrite this module.
-    button) {
+    buttons = []) {
         this.items = items;
         this.id = id;
         this.name = name;
         this.description = description;
         this.conversions = conversions;
         this.transforms = transforms;
-        this.button = button;
+        this.buttons = buttons;
         //Event handler which is triggered when the transform method is complete.
         this.onTransform = new EventHandler();
+        //Modifier handler which allows accessing and setting modifiers at different points.
+        this.modifiers = new ModifierHandler();
     }
     //Called on each activation cycle
     activate(planet) {
@@ -91,7 +101,7 @@ export class Module {
         const transform = (_a = this.transforms.get(transformName)) === null || _a === void 0 ? void 0 : _a.complete()(this.items);
         //Check that it pulls one that exists.
         if (transform) {
-            const { onTransform } = transform, transformExcluded = __rest(transform, ["onTransform"]);
+            const { onTransform, id } = transform, transformExcluded = __rest(transform, ["onTransform", "id"]);
             Object.assign(this, transformExcluded);
             this.onTransform.trigger(this);
         }

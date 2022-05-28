@@ -121,6 +121,7 @@ export class Items {
     unexploredLand = itemAccessor("unexploredLand", "Unexplored Land")
     land = itemAccessor("land", "Land")
     localWater = itemAccessor("localWater", "Local Water")
+    wood = itemAccessor("wood", "Wood")
 
     constructor() {
         this.population().addCapacity(this.housing(), 5)

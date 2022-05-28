@@ -116,6 +116,7 @@ export class Items {
         this.unexploredLand = itemAccessor("unexploredLand", "Unexplored Land");
         this.land = itemAccessor("land", "Land");
         this.localWater = itemAccessor("localWater", "Local Water");
+        this.wood = itemAccessor("wood", "Wood");
         this.population().addCapacity(this.housing(), 5);
         this.workForce().addCapacity(this.population());
     }

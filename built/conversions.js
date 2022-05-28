@@ -75,7 +75,7 @@ export class Conversion {
                         game.currentPlanet().globalModifiers.set(mS.modifierID, this, this.completions);
                     }
                     else if (typeof mS.value === "number") {
-                        game.currentPlanet().globalModifiers.set(mS.modifierID, this, mS.value);
+                        game.currentPlanet().globalModifiers.set(mS.modifierID, this, mS.value, true);
                     }
                 });
             }

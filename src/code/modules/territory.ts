@@ -1,6 +1,7 @@
 import { conversion } from "../conversions.js";
 import { Items } from "../data/items.js";
-import { module, ModuleExporter } from "../module.js";
+import { modi } from "../modifiers.js";
+import { module, ModuleExporter, unlock } from "../module.js";
 
 export const territory = (items: Items) => {
     return new ModuleExporter(
@@ -16,13 +17,22 @@ export const territory = (items: Items) => {
                     conversion()
                         .inputs([items.unexploredLand(1)])
                         .outputs([items.land(1), items.food(1), items.localWater(1)])
+                        .modifier(1, `exploredLand`)
                         .complete())
-                .transform(`outskirts`, 
-                module()
-                .name(`Outskirts`)
-                .description(`Outside of the boundary of the city, mostly unprotected and uncontrolled.
+                .transform(`outskirts`,
+                    module()
+                        .name(`Outskirts`)
+                        .description(`Outside of the boundary of the city, mostly unprotected and uncontrolled.
                 Your people travel out there to collect the things they need, it could be beneficial to have patrols protecting them.`)
+                        .conversions([
+                            conversion()
+                                .inputs([items.workForce(5)])
+                                .outputs([items.wood(1)])
+                                .complete()
+                        ])
+                        .unlockConditions([unlock(items.unexploredLand(), "equals", 0)])
                 )
+
                 .complete(),
             module()
                 .id("shelter")
@@ -50,6 +60,7 @@ export const territory = (items: Items) => {
                             conversion()
                                 .inputs([items.land(0.2), items.food(10)])
                                 .outputs([items.housing(1)])
+                                .modifier(`amount`, `cityLevel`)
                                 .complete()
                         )
                 )
@@ -62,11 +73,11 @@ export const territory = (items: Items) => {
                 .conversions([
                     conversion()
                         .inputs([items.food(1)])
-                        .outputs([items.population(0.05)])
+                        .outputs([items.population(0.05, [modi(`cityLevel`, 0.05)])])
                         .complete(),
                     conversion()
                         .inputs([items.food(1)])
-                        .outputs([items.workForce(1)])
+                        .outputs([items.workForce(1, [modi(`cityLevel`)])])
                         .complete()
                 ])
 

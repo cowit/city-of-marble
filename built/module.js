@@ -10,13 +10,57 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 import { EventHandler } from "./components/events.js";
-import { ModifierHandler } from "./modifiers.js";
+import { ModifiableVariable, ModifierHandler, ModifierReference } from "./modifiers.js";
+import { Item } from "./data/items.js";
+export function unlock(target, operator, condition) {
+    return new UnlockCondition(target, operator, condition);
+}
+export class UnlockCondition {
+    constructor(target, operator, condition) {
+        this.target = target;
+        this.operator = operator;
+        this.condition = condition;
+        if (target instanceof ModifierReference) {
+            this.target = game.currentPlanet().globalModifiers.subscribe(target, 0);
+        }
+    }
+    check() {
+        console.log(this.target);
+        if (typeof this.condition === "string" || this.operator === "equals") {
+            if (this.target instanceof ModifiableVariable) {
+                return this.target.total === this.condition;
+            }
+            else if (this.target instanceof Item) {
+                return this.target.total() === this.condition;
+            }
+        }
+        else if (this.operator === "less") {
+            if (this.target instanceof ModifiableVariable && this.target.total) {
+                return this.target.total < this.condition;
+            }
+            else if (this.target instanceof Item) {
+                return this.target.total() < this.condition;
+            }
+        }
+        else if (this.operator === "more") {
+            if (this.target instanceof ModifiableVariable && this.target.total) {
+                return this.target.total > this.condition;
+            }
+            else if (this.target instanceof Item) {
+                return this.target.total() > this.condition;
+            }
+        }
+        else
+            throw new Error(`No Targets where compatible in this unlock condition.`);
+    }
+}
 export class ModuleArguments {
     constructor() {
         this._conversions = [];
         this._buttons = [];
         this._description = "";
         this._transforms = new Map();
+        this._unlockConditions = [];
     }
     id(id) {
         this._id = id;
@@ -43,13 +87,17 @@ export class ModuleArguments {
         this._transforms.set(id, transform);
         return this;
     }
+    unlockConditions(conditions) {
+        this._unlockConditions = conditions;
+        return this;
+    }
     complete() {
         const mod = (items) => {
             if (!this._id)
                 throw new Error(`A Module Does not have an ID assigned to it.`);
             if (!this._name)
                 throw new Error(`Module ${this._id} does not have a Name assigned to it.`);
-            const module = new Module(items, this._id, this._name, this._description, this._conversions, this._transforms, this._buttons);
+            const module = new Module(items, this._id, this._name, this._description, this._conversions, this._transforms, this._buttons, this._unlockConditions);
             //Inject the module into all items/itemrefs so that they can use it's modifiers.
             module.conversions.forEach(con => {
                 con.inputs.forEach(inp => { inp.module = module; });
@@ -74,7 +122,7 @@ export function module() {
 //The module is what the base interface which interacts with the planet.
 export class Module {
     constructor(items, id, name, description, conversions, transforms, //A map of module arguments which can be completed and overwrite this module.
-    buttons = []) {
+    buttons = [], unlockConditions = [], unlocked = true) {
         this.items = items;
         this.id = id;
         this.name = name;
@@ -82,17 +130,53 @@ export class Module {
         this.conversions = conversions;
         this.transforms = transforms;
         this.buttons = buttons;
+        this.unlockConditions = unlockConditions;
+        this.unlocked = unlocked;
         //Event handler which is triggered when the transform method is complete.
         this.onTransform = new EventHandler();
         //Modifier handler which allows accessing and setting modifiers at different points.
         this.modifiers = new ModifierHandler();
+        if (unlockConditions.length > 0)
+            unlocked = false;
     }
     //Called on each activation cycle
     activate(planet) {
-        //Check the conversions, which will consume/output resources
-        this.conversions.forEach(con => {
-            con.checkConversion();
+        //Check the unlock conditions. If all succeed this module will be unlocked.
+        if (this.unlockConditions.length > 0) {
+            this.checkUnlocks();
+        }
+        //Don't check the conversions of a locked Module
+        if (this.unlocked) {
+            if (this.transforms.size > 0) {
+                this.transforms.forEach(trans => {
+                    if (trans._unlockConditions.length > 0) {
+                        var allTrue = true;
+                        trans._unlockConditions.forEach((uC) => {
+                            if (!uC.check())
+                                allTrue = false;
+                        });
+                        if (allTrue && trans._id)
+                            this.transform(trans._id);
+                    }
+                });
+            }
+            //Check the conversions, which will consume/output resources
+            this.conversions.forEach(con => {
+                con.checkConversion();
+            });
+        }
+    }
+    checkUnlocks() {
+        var allTrue = true;
+        this.unlockConditions.forEach((uC) => {
+            if (uC.check() === false)
+                allTrue = false;
         });
+        if (allTrue)
+            this.unlock();
+    }
+    unlock() {
+        this.unlocked = true;
     }
     //Transform this module using a set of module arguments.
     transform(transformName) {

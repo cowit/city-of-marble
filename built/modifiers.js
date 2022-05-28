@@ -20,7 +20,7 @@ export class ModifierHandler {
     constructor() {
         this.modifiers = new Map();
     }
-    set(modifierID, owner, value) {
+    set(modifierID, owner, value, increment) {
         var mods = this.modifiers.get(modifierID);
         if (!mods) {
             mods = new ModifierCollection();
@@ -30,7 +30,11 @@ export class ModifierHandler {
         if (!mod) {
             mod = new Modifier(value);
         }
-        mod.value = value;
+        //An incrementer option, which simply increments instead of setting the modifier value.
+        else if (increment && typeof value === "number" && typeof mod.value === "number")
+            mod.value = value + mod.value;
+        else
+            mod.value = value;
         mods.set(owner, mod);
     }
     subscribe(modifierRef, original) {

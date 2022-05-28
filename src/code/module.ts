@@ -1,17 +1,63 @@
 import { EventHandler } from "./components/events.js";
-import { ModifierHandler } from "./modifiers.js";
+import { ModifiableVariable, ModifierHandler, ModifierReference } from "./modifiers.js";
 import { Conversion } from "./conversions.js";
-import { Items } from "./data/items.js";
+import { Item, ItemRef, Items } from "./data/items.js";
 import { Planet } from "./planet.js";
 
+export function unlock(target: ModifierReference | Item, operator: `more` | `less` | `equals`, condition: number | string) {
+    return new UnlockCondition(target, operator, condition)
+}
+
+export class UnlockCondition {
+    constructor(
+        public target: ModifierReference | Item | ModifiableVariable<string | number>,
+        public operator: `more` | `less` | `equals`,
+        public condition: number | string
+    ) {
+
+        if (target instanceof ModifierReference) {
+            this.target = game.currentPlanet().globalModifiers.subscribe(target, 0)
+        }
+    }
+
+    check() {
+        console.log(this.target)
+        if (typeof this.condition === "string" || this.operator === "equals") {
+            if (this.target instanceof ModifiableVariable) {
+                return this.target.total === this.condition
+            }
+            else if (this.target instanceof Item) {
+                return this.target.total() === this.condition
+            }
+        }
+        else if (this.operator === "less") {
+            if (this.target instanceof ModifiableVariable && this.target.total) {
+                return this.target.total < this.condition
+            }
+            else if (this.target instanceof Item) {
+                return this.target.total() < this.condition
+            }
+        }
+        else if (this.operator === "more") {
+            if (this.target instanceof ModifiableVariable && this.target.total) {
+                return this.target.total > this.condition
+            }
+            else if (this.target instanceof Item) {
+                return this.target.total() > this.condition
+            }
+        }
+        else throw new Error(`No Targets where compatible in this unlock condition.`)
+    }
+}
 
 export class ModuleArguments {
-    private _id?: string
-    private _name?: string
+    public _id?: string
+    public _name?: string
     private _conversions: Conversion[] = []
     private _buttons: ModuleButton[] = []
     private _description: string = ""
     private _transforms = new Map<string, ModuleArguments>()
+    public _unlockConditions: UnlockCondition[] = []
     id(id: string) {
         this._id = id
         return this
@@ -43,6 +89,11 @@ export class ModuleArguments {
         return this
     }
 
+    unlockConditions(conditions: UnlockCondition[]) {
+        this._unlockConditions = conditions
+        return this
+    }
+
     complete() {
         const mod = (items: Items) => {
             if (!this._id) throw new Error(`A Module Does not have an ID assigned to it.`)
@@ -52,7 +103,8 @@ export class ModuleArguments {
                 this._name,
                 this._description,
                 this._conversions, this._transforms,
-                this._buttons)
+                this._buttons,
+                this._unlockConditions)
             //Inject the module into all items/itemrefs so that they can use it's modifiers.
             module.conversions.forEach(con => {
                 con.inputs.forEach(inp => { inp.module = module })
@@ -91,15 +143,53 @@ export class Module {
         public description: string,
         public conversions: Conversion[],
         public transforms: Map<string, ModuleArguments>, //A map of module arguments which can be completed and overwrite this module.
-        public buttons: ModuleButton[] = []
-    ) { }
+        public buttons: ModuleButton[] = [],
+        public unlockConditions: UnlockCondition[] = [],
+        public unlocked: boolean = true
+    ) {
+        if (unlockConditions.length > 0) unlocked = false
+    }
 
     //Called on each activation cycle
     activate(planet: Planet) {
-        //Check the conversions, which will consume/output resources
-        this.conversions.forEach(con => {
-            con.checkConversion()
+        //Check the unlock conditions. If all succeed this module will be unlocked.
+        if (this.unlockConditions.length > 0) {
+            this.checkUnlocks()
+        }
+
+        //Don't check the conversions of a locked Module
+        if (this.unlocked) {
+            if (this.transforms.size > 0) {
+
+                this.transforms.forEach(trans => {
+
+                    if (trans._unlockConditions.length > 0) {
+                        var allTrue = true
+                        trans._unlockConditions.forEach((uC) => {
+                            if (!uC.check()) allTrue = false
+                        })
+                        if (allTrue && trans._id) this.transform(trans._id)
+                    }
+                })
+
+            }
+            //Check the conversions, which will consume/output resources
+            this.conversions.forEach(con => {
+                con.checkConversion()
+            })
+        }
+    }
+
+    checkUnlocks() {
+        var allTrue = true
+        this.unlockConditions.forEach((uC) => {
+            if (uC.check() === false) allTrue = false
         })
+        if (allTrue) this.unlock()
+    }
+
+    unlock() {
+        this.unlocked = true
     }
 
     //Transform this module using a set of module arguments.

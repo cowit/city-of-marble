@@ -24,7 +24,7 @@ export class ModifiableVariable<variableType> {
 export class ModifierHandler<modifierType> {
     private modifiers = new Map<string, ModifierCollection<modifierType>>()
 
-    set(modifierID: string, owner: object, value: modifierType) {
+    set(modifierID: string, owner: object, value: modifierType, increment?: boolean) {
         var mods = this.modifiers.get(modifierID)
 
         if (!mods) {
@@ -35,7 +35,9 @@ export class ModifierHandler<modifierType> {
         if (!mod) {
             mod = new Modifier<modifierType>(value)
         }
-        mod.value = value
+        //An incrementer option, which simply increments instead of setting the modifier value.
+        else if (increment && typeof value === "number" && typeof mod.value === "number") (mod.value as number) = value + mod.value
+        else mod.value = value
         mods.set(owner, mod)
     }
 
@@ -77,6 +79,8 @@ export class ModifierCollection<modifierType> {
                 original.totalNumber -= this.total[1] * modifierRef.multiplier
                 original.total = this.total[2]
                 original.onModifierChange.trigger()
+
+
             })
             return original
         }

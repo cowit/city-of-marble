@@ -1,16 +1,28 @@
+import { EventHandler } from "../components/events.js"
 import { ModifiableVariable, ModifierReference } from "../modifiers.js"
 import { Module } from "../module.js"
 import { itemIcon } from "../ui.js"
 
+class ItemEvent {
+    constructor(public newAmount: number, public item: Item) { }
+}
+
 export class Item {
     //Main Variables
-    protected _amount: number = 0
+    public _amount: number = 0
     public capacity: number = 0
     protected capacities = new Map<string, Capacity>()
     public module?: Module
+    public unlocked = true
 
     //Events
-    protected listeners = new Map<string, ((newAmount: number, item: Item) => void)[]>()
+    public onAmountChange = new EventHandler<ItemEvent>()
+    public onTotalChange = new EventHandler<ItemEvent>()
+    public onModifierChange = new EventHandler<ItemEvent>()
+    protected events = new Map<string, EventHandler<ItemEvent>>()
+        .set(`amountChange`, this.onAmountChange)
+        .set(`totalChange`, this.onTotalChange)
+        .set(`modifierChange`, this.onModifierChange)
 
     constructor(public id: string, public name: string, public icon: string) { }
 
@@ -31,9 +43,7 @@ export class Item {
         if (this.capacities.size !== 0) newAmount = Math.min(this.capacity, newAmount)
         this._amount = newAmount
         //When the amount changes, call the amountChange event for all listeners.
-        this.listeners.get("amountChange")?.forEach((callback) => {
-            callback(this._amount, this)
-        })
+        this.onAmountChange.trigger(new ItemEvent(this._amount, this))
         return this
     }
 
@@ -42,10 +52,14 @@ export class Item {
         return this
     }
 
-    on(eventType: "amountChange" | "totalChange" | "modifierChange", callback: ((newAmount: number, item: Item) => void)) {
-        var eventArray = this.listeners.get(eventType)
-        if (!eventArray) this.listeners.set(eventType, [callback])
-        else eventArray.push(callback)
+    on(eventType: "amountChange" | "totalChange" | "modifierChange", callback: ((event: ItemEvent) => void)) {
+        var eventArray = this.events.get(eventType)
+        if (!eventArray) console.error(`Event type ${eventType} does not exist.`)
+        else eventArray.listen(callback)
+    }
+
+    trigger(eventType: "amountChange" | "totalChange" | "modifierChange") {
+        this.events.get(eventType)?.trigger(new ItemEvent(this._amount, this))
     }
 
     addCapacity(capItem: Item, multiplier: number = 1) {
@@ -64,8 +78,10 @@ export class ItemRef extends Item {
                 this.totalVar = game.currentPlanet().globalModifiers.subscribe(mod, this._amount)
             })
             this.totalVar?.onModifierChange.listen(() => {
-                this.listeners.get("modifierChange")?.forEach(
-                    (callback) => { callback(this.total(), this) })
+                //Called when a modifier is changed
+                this.onModifierChange.trigger(new ItemEvent(this.total(), this))
+                //Call as well to update the UI and anything else needed.
+                this.onAmountChange.trigger(new ItemEvent(this.total(), this))
             })
         }
     }
@@ -76,14 +92,16 @@ export class ItemRef extends Item {
         }
         else return this._amount
     }
+
+
 }
 
 class Capacity {
     amount = 0
     constructor(public item: Item, public capItem: Item, public multiplier: number) {
-        capItem.on("amountChange", (newAmount) => {
+        capItem.on("amountChange", (e) => {
             //Get the difference between the new and old amount
-            const changeBy = this.amount - newAmount * multiplier
+            const changeBy = this.amount - e.newAmount * multiplier
             //Change the stored amount and the total amount.
             this.amount -= changeBy
             item.capacity -= changeBy

@@ -1,4 +1,11 @@
+import { EventHandler } from "../components/events.js";
 import { itemIcon } from "../ui.js";
+class ItemEvent {
+    constructor(newAmount, item) {
+        this.newAmount = newAmount;
+        this.item = item;
+    }
+}
 export class Item {
     constructor(id, name, icon) {
         this.id = id;
@@ -8,8 +15,15 @@ export class Item {
         this._amount = 0;
         this.capacity = 0;
         this.capacities = new Map();
+        this.unlocked = true;
         //Events
-        this.listeners = new Map();
+        this.onAmountChange = new EventHandler();
+        this.onTotalChange = new EventHandler();
+        this.onModifierChange = new EventHandler();
+        this.events = new Map()
+            .set(`amountChange`, this.onAmountChange)
+            .set(`totalChange`, this.onTotalChange)
+            .set(`modifierChange`, this.onModifierChange);
     }
     checkAmount(divisor) {
         //If a divisor is passed, divide the number by that amount. Else return the amount.
@@ -23,15 +37,12 @@ export class Item {
         return this._amount;
     }
     amount(newAmount) {
-        var _a;
         //If the capacity is set to 0, uncap it. Otherwise cap it.
         if (this.capacities.size !== 0)
             newAmount = Math.min(this.capacity, newAmount);
         this._amount = newAmount;
         //When the amount changes, call the amountChange event for all listeners.
-        (_a = this.listeners.get("amountChange")) === null || _a === void 0 ? void 0 : _a.forEach((callback) => {
-            callback(this._amount, this);
-        });
+        this.onAmountChange.trigger(new ItemEvent(this._amount, this));
         return this;
     }
     add(addend) {
@@ -39,11 +50,15 @@ export class Item {
         return this;
     }
     on(eventType, callback) {
-        var eventArray = this.listeners.get(eventType);
+        var eventArray = this.events.get(eventType);
         if (!eventArray)
-            this.listeners.set(eventType, [callback]);
+            console.error(`Event type ${eventType} does not exist.`);
         else
-            eventArray.push(callback);
+            eventArray.listen(callback);
+    }
+    trigger(eventType) {
+        var _a;
+        (_a = this.events.get(eventType)) === null || _a === void 0 ? void 0 : _a.trigger(new ItemEvent(this._amount, this));
     }
     addCapacity(capItem, multiplier = 1) {
         this.capacities.set(capItem.id, new Capacity(this, capItem, multiplier));
@@ -63,8 +78,10 @@ export class ItemRef extends Item {
                 this.totalVar = game.currentPlanet().globalModifiers.subscribe(mod, this._amount);
             });
             (_a = this.totalVar) === null || _a === void 0 ? void 0 : _a.onModifierChange.listen(() => {
-                var _a;
-                (_a = this.listeners.get("modifierChange")) === null || _a === void 0 ? void 0 : _a.forEach((callback) => { callback(this.total(), this); });
+                //Called when a modifier is changed
+                this.onModifierChange.trigger(new ItemEvent(this.total(), this));
+                //Call as well to update the UI and anything else needed.
+                this.onAmountChange.trigger(new ItemEvent(this.total(), this));
             });
         }
     }
@@ -82,9 +99,9 @@ class Capacity {
         this.capItem = capItem;
         this.multiplier = multiplier;
         this.amount = 0;
-        capItem.on("amountChange", (newAmount) => {
+        capItem.on("amountChange", (e) => {
             //Get the difference between the new and old amount
-            const changeBy = this.amount - newAmount * multiplier;
+            const changeBy = this.amount - e.newAmount * multiplier;
             //Change the stored amount and the total amount.
             this.amount -= changeBy;
             item.capacity -= changeBy;

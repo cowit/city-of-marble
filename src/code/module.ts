@@ -2,7 +2,8 @@ import { EventHandler } from "./components/events.js";
 import { ModifiableVariable, ModifierHandler, ModifierReference } from "./modifiers.js";
 import { Conversion } from "./conversions.js";
 import { Item, ItemRef, Items } from "./data/items.js";
-import { Planet } from "./planet.js";
+import { ModuleHandler } from "./module-handler.js";
+import { UIComponent } from "./ui.js";
 
 export function unlock(target: ModifierReference | Item, operator: `more` | `less` | `equals`, condition: number | string) {
     return new UnlockCondition(target, operator, condition)
@@ -21,7 +22,6 @@ export class UnlockCondition {
     }
 
     check() {
-        console.log(this.target)
         if (typeof this.condition === "string" || this.operator === "equals") {
             if (this.target instanceof ModifiableVariable) {
                 return this.target.total === this.condition
@@ -31,18 +31,21 @@ export class UnlockCondition {
             }
         }
         else if (this.operator === "less") {
-            if (this.target instanceof ModifiableVariable && this.target.total) {
-                return this.target.total < this.condition
+            if (this.target instanceof ModifiableVariable) {
+
+                return this.target.totalNumber < this.condition
             }
             else if (this.target instanceof Item) {
                 return this.target.total() < this.condition
             }
         }
         else if (this.operator === "more") {
-            if (this.target instanceof ModifiableVariable && this.target.total) {
-                return this.target.total > this.condition
+            if (this.target instanceof ModifiableVariable) {
+
+                return this.target.totalNumber > this.condition
             }
             else if (this.target instanceof Item) {
+
                 return this.target.total() > this.condition
             }
         }
@@ -53,10 +56,10 @@ export class UnlockCondition {
 export class ModuleArguments {
     public _id?: string
     public _name?: string
-    private _conversions: Conversion[] = []
+    public _conversions: Conversion[] = []
     private _buttons: ModuleButton[] = []
     private _description: string = ""
-    private _transforms = new Map<string, ModuleArguments>()
+    public _transforms = new Map<string, ModuleArguments>()
     public _unlockConditions: UnlockCondition[] = []
     id(id: string) {
         this._id = id
@@ -79,6 +82,7 @@ export class ModuleArguments {
     }
 
     button(type: "build" | "trigger" | "buildIncreaseAmount", title: string, cost: Conversion, transform?: string) {
+        cost.build()
         this._buttons.push(new ModuleButton(type, title, cost, transform))
         return this
     }
@@ -132,10 +136,15 @@ export function module() {
 
 //The module is what the base interface which interacts with the planet.
 export class Module {
+    uiComponent?: UIComponent
     //Event handler which is triggered when the transform method is complete.
     onTransform = new EventHandler<Module>()
     //Modifier handler which allows accessing and setting modifiers at different points.
     modifiers = new ModifierHandler<number | string>()
+    //Transform ID used for saving
+    transformID?: string
+    //History of transforms used for saving
+    transformHistory: string[] = []
     constructor(
         public items: Items,
         public id: string,
@@ -147,13 +156,13 @@ export class Module {
         public unlockConditions: UnlockCondition[] = [],
         public unlocked: boolean = true
     ) {
-        if (unlockConditions.length > 0) unlocked = false
+        if (unlockConditions.length > 0) this.unlocked = false
     }
 
     //Called on each activation cycle
-    activate(planet: Planet) {
+    activate(planet: ModuleHandler) {
         //Check the unlock conditions. If all succeed this module will be unlocked.
-        if (this.unlockConditions.length > 0) {
+        if (!this.unlocked && this.unlockConditions.length > 0) {
             this.checkUnlocks()
         }
 
@@ -190,20 +199,23 @@ export class Module {
 
     unlock() {
         this.unlocked = true
+        this.uiComponent?.show()
     }
 
     //Transform this module using a set of module arguments.
-    transform(transformName: string) {
+    transform(transformID: string) {
         //Attempt to get the transform from the transforms map.
-        const transform = this.transforms.get(transformName)?.complete()(this.items)
+        const transform = this.transforms.get(transformID)?.complete()(this.items)
 
         //Check that it pulls one that exists.
         if (transform) {
-            const { onTransform, id, ...transformExcluded } = transform
+            this.transformID = transformID
+            this.transformHistory.push(transformID)
+            const { onTransform, id, transformHistory, ...transformExcluded } = transform
             Object.assign(this, transformExcluded)
             this.onTransform.trigger(this)
         }
-        else console.warn(`Could not find transform ${transformName} on module ${this.id}`)
+        else console.warn(`Could not find transform ${transformID} on module ${this.id}`)
 
     }
 }

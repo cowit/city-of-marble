@@ -1,19 +1,19 @@
-import { Planet } from "./planet.js";
+import { ModuleHandler } from "./module-handler.js";
 
 export class Game {
-    planets: Planet[] = []
+    moduleHandlers: ModuleHandler[] = []
 
     createPlanet(name: string) {
-        const planet = new Planet(name)
-        this.planets.push(planet)
+        const planet = new ModuleHandler(name)
+        this.moduleHandlers.push(planet)
         return planet
     }
 
     activate() {
-        this.planets.forEach(pla => { pla.activate() })
+        this.moduleHandlers.forEach(pla => { pla.activate() })
     }
 
     currentPlanet() {
-        return this.planets[0]
+        return this.moduleHandlers[0]
     }
 }

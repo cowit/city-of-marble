@@ -22,9 +22,9 @@ export class ModifiableVariable<variableType> {
 }
 
 export class ModifierHandler<modifierType> {
-    private modifiers = new Map<string, ModifierCollection<modifierType>>()
+    public modifiers = new Map<string, ModifierCollection<modifierType>>()
 
-    set(modifierID: string, owner: object, value: modifierType, increment?: boolean) {
+    set(modifierID: string, owner: string, value: modifierType, increment?: boolean) {
         var mods = this.modifiers.get(modifierID)
 
         if (!mods) {
@@ -55,22 +55,22 @@ export class ModifierHandler<modifierType> {
 }
 
 export class ModifierCollection<modifierType> {
-    public collection = new Map<object, Modifier<modifierType>>()
-    private modVariables = new EventHandler<[number, modifierType?]>()
+    public collection = new Map<string, Modifier<modifierType>>()
+    private modVariables = new EventHandler<[number, number, modifierType?]>()
     private total: [number, number, modifierType?] = [0, 0]
 
-    get(ownerID: object) {
+    get(ownerID: string) {
         return this.collection.get(ownerID)
     }
 
-    set(key: object, mod: Modifier<modifierType>) {
+    set(key: string, mod: Modifier<modifierType>) {
         this.collection.set(key, mod)
         if (typeof mod.value === "number") {
             this.total[1] = this.total[0] - mod.value
             this.total[0] -= this.total[1]
         }
         this.total[2] = mod.value
-        this.modVariables.trigger()
+        this.modVariables.trigger(this.total)
     }
 
     subscribe(original: modifierType | ModifiableVariable<modifierType>, modifierRef: ModifierReference) {
@@ -78,7 +78,7 @@ export class ModifierCollection<modifierType> {
             this.modVariables.listen(() => {
                 original.totalNumber -= this.total[1] * modifierRef.multiplier
                 original.total = this.total[2]
-                original.onModifierChange.trigger()
+                original.onModifierChange.trigger(original.totalNumber)
 
 
             })
@@ -91,7 +91,7 @@ export class ModifierCollection<modifierType> {
             this.modVariables.listen(() => {
                 modVar.totalNumber -= this.total[1] * modifierRef.multiplier
                 modVar.total = this.total[2]
-                modVar.onModifierChange.trigger()
+                modVar.onModifierChange.trigger(modVar.totalNumber)
             })
             return modVar
         }

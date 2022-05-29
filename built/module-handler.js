@@ -5,16 +5,17 @@ export class ModuleHandler {
     constructor(name) {
         this.name = name;
         this.items = new Items();
-        this.modules = [];
         this.lines = new Map();
         this.moduleContainer = new UIComponent($(`#module-display`));
+        this.modules = new Map();
         this.globalModifiers = new ModifierHandler();
+        this.conversions = new Map();
     }
     activate() {
         this.modules.forEach(mod => { mod.activate(this); });
     }
     addModuleLine(createModEx) {
-        const modEx = createModEx(this.items, this.globalModifiers);
+        const modEx = createModEx(this.items);
         let line = this.lines.get(modEx.id);
         if (!line) {
             line = this.moduleContainer.moduleLine();
@@ -23,8 +24,12 @@ export class ModuleHandler {
         modEx.modArray.forEach((mod) => {
             const module = mod(this.items);
             line === null || line === void 0 ? void 0 : line.module(module);
-            this.modules.push(module);
+            if (this.modules.has(module.id)) {
+                throw new Error(`Module with ID ${module.id} already exists, please fix conflict.`);
+            }
+            else
+                this.modules.set(module.id, module);
         });
     }
 }
-//# sourceMappingURL=planet.js.map
+//# sourceMappingURL=module-handler.js.map

@@ -1,11 +1,12 @@
 import { Game } from "./game.js";
 import { foraging } from "./modules/food.js";
 import { territory } from "./modules/territory.js";
+import { loadSaveFile, saveModuleHandler } from "./saving.js";
 globalThis.game = new Game();
 const earth = game.createPlanet("Earth");
 earth.addModuleLine(territory);
 earth.addModuleLine(foraging);
-earth.items.unexploredLand().amount(100);
+earth.items.unexploredLand().amount(10);
 earth.items.land().amount(100);
 earth.items.housing().amount(100);
 earth.items.population().amount(100);
@@ -23,4 +24,6 @@ globalThis.tooltip = {
     hide() { tooltipEle.hide(); }
 };
 setInterval(game.activate.bind(game), 1000);
+$(`#save-button`).on("click", () => { saveModuleHandler(earth); });
+$(`#load-button`).on("click", () => { loadSaveFile(window.localStorage.getItem(`saveFile`), earth); });
 //# sourceMappingURL=script.js.map

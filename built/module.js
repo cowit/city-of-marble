@@ -25,7 +25,6 @@ export class UnlockCondition {
         }
     }
     check() {
-        console.log(this.target);
         if (typeof this.condition === "string" || this.operator === "equals") {
             if (this.target instanceof ModifiableVariable) {
                 return this.target.total === this.condition;
@@ -35,16 +34,16 @@ export class UnlockCondition {
             }
         }
         else if (this.operator === "less") {
-            if (this.target instanceof ModifiableVariable && this.target.total) {
-                return this.target.total < this.condition;
+            if (this.target instanceof ModifiableVariable) {
+                return this.target.totalNumber < this.condition;
             }
             else if (this.target instanceof Item) {
                 return this.target.total() < this.condition;
             }
         }
         else if (this.operator === "more") {
-            if (this.target instanceof ModifiableVariable && this.target.total) {
-                return this.target.total > this.condition;
+            if (this.target instanceof ModifiableVariable) {
+                return this.target.totalNumber > this.condition;
             }
             else if (this.target instanceof Item) {
                 return this.target.total() > this.condition;
@@ -79,6 +78,7 @@ export class ModuleArguments {
         return this;
     }
     button(type, title, cost, transform) {
+        cost.build();
         this._buttons.push(new ModuleButton(type, title, cost, transform));
         return this;
     }
@@ -136,13 +136,15 @@ export class Module {
         this.onTransform = new EventHandler();
         //Modifier handler which allows accessing and setting modifiers at different points.
         this.modifiers = new ModifierHandler();
+        //History of transforms used for saving
+        this.transformHistory = [];
         if (unlockConditions.length > 0)
-            unlocked = false;
+            this.unlocked = false;
     }
     //Called on each activation cycle
     activate(planet) {
         //Check the unlock conditions. If all succeed this module will be unlocked.
-        if (this.unlockConditions.length > 0) {
+        if (!this.unlocked && this.unlockConditions.length > 0) {
             this.checkUnlocks();
         }
         //Don't check the conversions of a locked Module
@@ -176,21 +178,25 @@ export class Module {
             this.unlock();
     }
     unlock() {
+        var _a;
         this.unlocked = true;
+        (_a = this.uiComponent) === null || _a === void 0 ? void 0 : _a.show();
     }
     //Transform this module using a set of module arguments.
-    transform(transformName) {
+    transform(transformID) {
         var _a;
         //Attempt to get the transform from the transforms map.
-        const transform = (_a = this.transforms.get(transformName)) === null || _a === void 0 ? void 0 : _a.complete()(this.items);
+        const transform = (_a = this.transforms.get(transformID)) === null || _a === void 0 ? void 0 : _a.complete()(this.items);
         //Check that it pulls one that exists.
         if (transform) {
-            const { onTransform, id } = transform, transformExcluded = __rest(transform, ["onTransform", "id"]);
+            this.transformID = transformID;
+            this.transformHistory.push(transformID);
+            const { onTransform, id, transformHistory } = transform, transformExcluded = __rest(transform, ["onTransform", "id", "transformHistory"]);
             Object.assign(this, transformExcluded);
             this.onTransform.trigger(this);
         }
         else
-            console.warn(`Could not find transform ${transformName} on module ${this.id}`);
+            console.warn(`Could not find transform ${transformID} on module ${this.id}`);
     }
 }
 export class ModuleExporter {

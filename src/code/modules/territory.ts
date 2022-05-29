@@ -15,8 +15,9 @@ export const territory = (items: Items) => {
                 .conversions([])
                 .button("trigger", "Explore for more land to forage",
                     conversion()
+                        .id(`exploreButton`)
                         .inputs([items.unexploredLand(1)])
-                        .outputs([items.land(1), items.food(1), items.localWater(1)])
+                        .outputs([items.land(1), items.food(1), items.localWater(1), items.wood(1)])
                         .modifier(1, `exploredLand`)
                         .complete())
                 .transform(`outskirts`,
@@ -26,6 +27,7 @@ export const territory = (items: Items) => {
                 Your people travel out there to collect the things they need, it could be beneficial to have patrols protecting them.`)
                         .conversions([
                             conversion()
+                                .id(`outskirtsButton`)
                                 .inputs([items.workForce(5)])
                                 .outputs([items.wood(1)])
                                 .complete()
@@ -41,11 +43,13 @@ export const territory = (items: Items) => {
                 <br> (Each piece of land you have visited can support 1 more camp.)`)
                 .button("build", "Set up another camp",
                     conversion()
+                        .id(`setUpAnotherCamp`)
                         .inputs([items.land(1)])
                         .outputs([items.housing(1)])
                         .complete())
                 .button("trigger", "The beginnings of a city..",
                     conversion()
+                        .id(`startCity`)
                         .inputs([items.housing(100, [], true)])
                         .complete(),
                     `city`
@@ -58,9 +62,10 @@ export const territory = (items: Items) => {
                 Your population will now grow faster and their housing will begin to get more compact with better materials being used..`)
                         .button("build", "Building more housing",
                             conversion()
-                                .inputs([items.land(0.2), items.food(10)])
+                                .id(`cityBuildHouse`)
+                                .inputs([items.land(0.2), items.wood(5)])
                                 .outputs([items.housing(1)])
-                                .modifier(`amount`, `cityLevel`)
+                                .modifier(`completions`, `cityLevel`)
                                 .complete()
                         )
                 )
@@ -72,12 +77,16 @@ export const territory = (items: Items) => {
                  As your population grows you will will be able to have a larger workforce.`)
                 .conversions([
                     conversion()
+                        .id(`popGrowthPops`)
                         .inputs([items.food(1)])
                         .outputs([items.population(0.05, [modi(`cityLevel`, 0.05)])])
+                        .amount(1)
                         .complete(),
                     conversion()
+                        .id(`popGrowthWorkForce`)
                         .inputs([items.food(1)])
                         .outputs([items.workForce(1, [modi(`cityLevel`)])])
+                        .amount(1)
                         .complete()
                 ])
 

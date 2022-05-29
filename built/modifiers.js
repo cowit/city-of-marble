@@ -64,14 +64,14 @@ export class ModifierCollection {
             this.total[0] -= this.total[1];
         }
         this.total[2] = mod.value;
-        this.modVariables.trigger();
+        this.modVariables.trigger(this.total);
     }
     subscribe(original, modifierRef) {
         if (original instanceof ModifiableVariable) {
             this.modVariables.listen(() => {
                 original.totalNumber -= this.total[1] * modifierRef.multiplier;
                 original.total = this.total[2];
-                original.onModifierChange.trigger();
+                original.onModifierChange.trigger(original.totalNumber);
             });
             return original;
         }
@@ -82,7 +82,7 @@ export class ModifierCollection {
             this.modVariables.listen(() => {
                 modVar.totalNumber -= this.total[1] * modifierRef.multiplier;
                 modVar.total = this.total[2];
-                modVar.onModifierChange.trigger();
+                modVar.onModifierChange.trigger(modVar.totalNumber);
             });
             return modVar;
         }

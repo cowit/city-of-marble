@@ -1,0 +1,21 @@
+Items:
+  ID = for loading it
+  Amount = Number
+  Unlock state = Boolean
+
+Modules:
+  ID
+  transform History = string[]
+  Unlocked = boolean
+
+Conversion:
+  Id: For loading it
+  Current: Number
+  Amount: Number
+  Completions: Number
+
+
+Modifiers:
+  OwnerID: for loading it
+  ModifierID:
+  Amount = number

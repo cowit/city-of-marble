@@ -1,9 +1,9 @@
-import { modi, ModifierHandler } from "../modifiers.js";
+import { modi } from "../modifiers.js";
 import { conversion } from "../conversions.js";
 import { Items } from "../data/items.js";
-import { module, ModuleExporter } from "../module.js";
+import { module, ModuleExporter, unlock } from "../module.js";
 
-export const foraging = (items: Items, globalModifiers: ModifierHandler<number | string>) => {
+export const foraging = (items: Items) => {
     return new ModuleExporter(
         "foraging",
         [
@@ -13,10 +13,18 @@ export const foraging = (items: Items, globalModifiers: ModifierHandler<number |
                 .description(`Your people will help you forage, feeding themselves and helping others.`)
                 .conversions([
                     conversion()
+                        .id(`foragingForage`)
                         .inputs([])
                         .outputs([items.food(3)])
+                        .amount(1)
                         .complete()
                 ])
+                .transform(`foodLine`,
+                    module()
+                        .name("Food Production")
+                        .description(`Manage your production of food.`)
+                        .unlockConditions([unlock(modi(`farmsBuilt`), "more", 5)])
+                )
                 .complete(),
             module()
                 .id("farming")
@@ -24,6 +32,7 @@ export const foraging = (items: Items, globalModifiers: ModifierHandler<number |
                 .description(`Plant some seeds from the most delicious crops in the muddy earth.`)
                 .button("trigger", `Plant seeds`,
                     conversion()
+                        .id(`farmingPlantSeed`)
                         .inputs([items.food(1)])
                         .outputs([])
                         .complete(),
@@ -36,13 +45,16 @@ export const foraging = (items: Items, globalModifiers: ModifierHandler<number |
                         This years growth in the area that you planted the seeds has grown better than any other.`)
                         .conversions([
                             conversion()
-                                .inputs([items.workForce(4, [modi(`irrigation`)])])
-                                .outputs([items.food(4, [modi(`irrigation`)])])
+                                .id(`farmingHarvesting`)
+                                .inputs([items.workForce(4, [modi(`irrigation`, 0.1)])])
+                                .outputs([items.food(5, [modi(`irrigation`, 0.25)])])
                                 .complete()
                         ])
                         .button("build", "Sow more land",
                             conversion()
+                                .id(`farmingSowMoreLand`)
                                 .inputs([items.land(1)])
+                                .modifier(`completions`, `farmsBuilt`)
                                 .complete()
                         )
                 )
@@ -53,8 +65,10 @@ export const foraging = (items: Items, globalModifiers: ModifierHandler<number |
                 .name("Basic Irrigation")
                 .description(`Your people have started to notice that the best growing crops are grouped around the ponds and streams.
             Some have made small trenches for the water to flow deeper in towards the crops.`)
+                .unlockConditions([unlock(modi(`farmsBuilt`), "more", 5)])
                 .button("build", "Invest in digging more trenches",
                     conversion()
+                        .id(`irrigationDigMore`)
                         .inputs([items.localWater(1, [modi(`irrigation`, 0.5)])])
                         .modifier(`completions`, `irrigation`)
                         .complete()

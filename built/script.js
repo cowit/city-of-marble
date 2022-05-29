@@ -7,10 +7,10 @@ const earth = game.createPlanet("Earth");
 earth.addModuleLine(territory);
 earth.addModuleLine(foraging);
 earth.items.unexploredLand().amount(10);
-earth.items.land().amount(100);
-earth.items.housing().amount(100);
-earth.items.population().amount(100);
-earth.items.workForce().amount(100);
+//earth.items.land().amount(100)
+//earth.items.housing().amount(100)
+//earth.items.population().amount(100)
+//earth.items.workForce().amount(100)
 const tooltipEle = $(`#tooltip`);
 const tooltipName = $(`.tooltip-name`);
 globalThis.tooltip = {

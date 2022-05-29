@@ -12,7 +12,7 @@ export const territory = (items) => {
             .button("trigger", "Explore for more land to forage", conversion()
             .id(`exploreButton`)
             .inputs([items.unexploredLand(1)])
-            .outputs([items.land(1), items.food(1), items.localWater(1), items.wood(1)])
+            .outputs([items.land(1), items.localWater(1), items.wood(1)])
             .modifier(1, `exploredLand`)
             .complete())
             .transform(`outskirts`, module()
@@ -21,8 +21,9 @@ export const territory = (items) => {
                 Your people travel out there to collect the things they need, it could be beneficial to have patrols protecting them.`)
             .conversions([
             conversion()
-                .id(`outskirtsButton`)
-                .inputs([items.workForce(5)])
+                .id(`outskirtsWood`)
+                .amount(1)
+                .inputs([items.workForce(3)])
                 .outputs([items.wood(1)])
                 .complete()
         ])
@@ -33,6 +34,7 @@ export const territory = (items) => {
             .name("Set Up Camp")
             .description(`Set up temporary camps to return to.
                 <br> (Each piece of land you have visited can support 1 more camp.)`)
+            .unlockConditions([unlock(items.land(), "more", 5)])
             .button("build", "Set up another camp", conversion()
             .id(`setUpAnotherCamp`)
             .inputs([items.land(1)])
@@ -40,7 +42,7 @@ export const territory = (items) => {
             .complete())
             .button("trigger", "The beginnings of a city..", conversion()
             .id(`startCity`)
-            .inputs([items.housing(100, [], true)])
+            .inputs([items.housing(20, [], true)])
             .complete(), `city`)
             .transform(`city`, module()
             .name("City")
@@ -59,11 +61,12 @@ export const territory = (items) => {
             .name("Growing Population")
             .description(`Your group is beginning to grow now.
                  As your population grows you will will be able to have a larger workforce.`)
+            .unlockConditions([unlock(items.housing(), "equals", 2)])
             .conversions([
             conversion()
                 .id(`popGrowthPops`)
                 .inputs([items.food(1)])
-                .outputs([items.population(0.05, [modi(`cityLevel`, 0.05)])])
+                .outputs([items.population(0.1, [modi(`cityLevel`, 0.1)])])
                 .amount(1)
                 .complete(),
             conversion()

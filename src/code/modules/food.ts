@@ -15,7 +15,7 @@ export const foraging = (items: Items) => {
                     conversion()
                         .id(`foragingForage`)
                         .inputs([])
-                        .outputs([items.food(3)])
+                        .outputs([items.food(1)])
                         .amount(1)
                         .complete()
                 ])
@@ -30,6 +30,7 @@ export const foraging = (items: Items) => {
                 .id("farming")
                 .name("Plant Seeds")
                 .description(`Plant some seeds from the most delicious crops in the muddy earth.`)
+                .unlockConditions([unlock(items.housing(), "equals", 1)])
                 .button("trigger", `Plant seeds`,
                     conversion()
                         .id(`farmingPlantSeed`)

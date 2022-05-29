@@ -80,6 +80,10 @@ body {
 .button {
     background-color: var(--light-filter);
     cursor: pointer;
+    height: fit-content;
+    padding: 8px;
+    border-top-right-radius: 12px;
+    border-bottom-left-radius: 12px;
 }
 
 .button:hover {
@@ -100,12 +104,14 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding: 0;
 }
 
 .square-button {
     border: var(--dark-filter) 4px solid;
     border-top-right-radius: 7px;
     border-bottom-left-radius: 7px;
+    padding: 0;
     height: fit-content;
     width: 20px;
     height: 20px;

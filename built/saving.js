@@ -41,11 +41,9 @@ export function saveModuleHandler(handler) {
         });
     });
     window.localStorage.setItem(`saveFile`, JSON.stringify(jsonSaver));
-    console.log(jsonSaver);
 }
 export function loadSaveFile(file, handler) {
     const jsonSave = JSON.parse(file);
-    console.log(jsonSave);
     //Load Items
     jsonSave.items.forEach((ite) => {
         const item = handler.items[ite.id]();
@@ -56,7 +54,6 @@ export function loadSaveFile(file, handler) {
     jsonSave.modules.forEach((mod) => {
         const module = handler.modules.get(mod.id);
         if (module) {
-            console.log(mod.transformHistory);
             mod.transformHistory.forEach((tra) => {
                 module.transform(tra);
             });
@@ -78,7 +75,7 @@ export function loadSaveFile(file, handler) {
             conversion.completions = con.completions;
         }
         else
-            console.warn(`Unable to find module ${con.id}`);
+            console.warn(`Unable to find conversion ${con.id}`);
     });
     //Load Modifiers
     jsonSave.modifiers.forEach((mod) => {

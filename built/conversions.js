@@ -45,8 +45,10 @@ export class ConversionArguments {
         return con;
     }
 }
-export function conversion() {
-    return new ConversionArguments();
+export function conversion(id) {
+    const conArg = new ConversionArguments();
+    conArg.id(id);
+    return conArg;
 }
 export class Conversion {
     constructor(id, inputs, outputs, modifierSelectors, onFinish, amount = 0) {
@@ -66,7 +68,9 @@ export class Conversion {
         let maxConversions = this.amount;
         //Reduce maxConversions to the input that can make the fewest activations.
         this.inputs.forEach(inp => {
-            maxConversions = Math.floor(Math.min(inp.item.checkAmount(inp.total()), maxConversions));
+            if (inp.total() > 0) {
+                maxConversions = Math.floor(Math.min(inp.item.checkAmount(inp.total()), maxConversions));
+            }
         });
         //If there is more than 0 conversions, activate the outputs multiplied by the max conversions.
         if (maxConversions >= 1) {
@@ -92,6 +96,9 @@ export class Conversion {
                     }
                     else if (mS.value === "completions") {
                         game.currentPlanet().globalModifiers.set(mS.modifierID, this.id, this.completions);
+                    }
+                    else if (mS.value === "current") {
+                        game.currentPlanet().globalModifiers.set(mS.modifierID, this.id, this.current);
                     }
                     else if (typeof mS.value === "number") {
                         game.currentPlanet().globalModifiers.set(mS.modifierID, this.id, mS.value, true);

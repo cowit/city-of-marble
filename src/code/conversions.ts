@@ -1,7 +1,7 @@
 import { EventHandler } from "./components/events.js"
 import { ItemRef } from "./data/items.js"
 
-type conversionProperty = "amount" | "completions"
+type conversionProperty = "amount" | "completions" | "current"
 
 export class modifierSelector {
     constructor(public value: conversionProperty | number, public modifierID: string) { }
@@ -58,8 +58,10 @@ export class ConversionArguments {
     }
 }
 
-export function conversion() {
-    return new ConversionArguments()
+export function conversion(id: string) {
+    const conArg = new ConversionArguments()
+    conArg.id(id)
+    return conArg
 }
 
 export class Conversion {
@@ -83,7 +85,9 @@ export class Conversion {
         let maxConversions: number = this.amount
         //Reduce maxConversions to the input that can make the fewest activations.
         this.inputs.forEach(inp => {
-            maxConversions = Math.floor(Math.min(inp.item.checkAmount(inp.total()), maxConversions))
+            if (inp.total() > 0) {
+                maxConversions = Math.floor(Math.min(inp.item.checkAmount(inp.total()), maxConversions))
+            }
         })
         //If there is more than 0 conversions, activate the outputs multiplied by the max conversions.
         if (maxConversions >= 1) {
@@ -110,9 +114,13 @@ export class Conversion {
                     else if (mS.value === "completions") {
                         game.currentPlanet().globalModifiers.set(mS.modifierID, this.id, this.completions)
                     }
+                    else if (mS.value === "current") {
+                        game.currentPlanet().globalModifiers.set(mS.modifierID, this.id, this.current)
+                    }
                     else if (typeof mS.value === "number") {
                         game.currentPlanet().globalModifiers.set(mS.modifierID, this.id, mS.value, true)
                     }
+
                 })
             }
         }

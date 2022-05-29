@@ -123,7 +123,7 @@ function itemAccessor(id: string, name: string) {
     function quickAccess(): Item
     function quickAccess(refAmount?: number, modifiers?: ModifierReference[], dontConsume?: boolean): ItemRef
     function quickAccess(refAmount?: number, modifiers?: ModifierReference[], dontConsume: boolean = false): Item | ItemRef {
-        if (refAmount) {
+        if (refAmount !== undefined) {
             return new ItemRef(item, refAmount, modifiers, dontConsume)
         }
         else return item
@@ -140,6 +140,8 @@ export class Items {
     land = itemAccessor("land", "Land")
     localWater = itemAccessor("localWater", "Local Water")
     wood = itemAccessor("wood", "Wood")
+    metalOre = itemAccessor("metalOre", "Metal Ore")
+    metal = itemAccessor("metal", "Metal")
 
     constructor() {
         this.population().addCapacity(this.housing(), 5)

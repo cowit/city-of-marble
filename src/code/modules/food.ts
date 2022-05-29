@@ -12,8 +12,7 @@ export const foraging = (items: Items) => {
                 .name("Foraging")
                 .description(`Your people will help you forage, feeding themselves and helping others.`)
                 .conversions([
-                    conversion()
-                        .id(`foragingForage`)
+                    conversion(`foragingForage`)
                         .inputs([])
                         .outputs([items.food(1)])
                         .amount(1)
@@ -30,10 +29,9 @@ export const foraging = (items: Items) => {
                 .id("farming")
                 .name("Plant Seeds")
                 .description(`Plant some seeds from the most delicious crops in the muddy earth.`)
-                .unlockConditions([unlock(items.housing(), "equals", 1)])
+                .unlockConditions([unlock(items.housing(), "more", 1)])
                 .button("trigger", `Plant seeds`,
-                    conversion()
-                        .id(`farmingPlantSeed`)
+                    conversion(`farmingPlantSeed`)
                         .inputs([items.food(1)])
                         .outputs([])
                         .complete(),
@@ -45,15 +43,13 @@ export const foraging = (items: Items) => {
                         .description(`Your people have begun to reap what they sowed previously.  
                         This years growth in the area that you planted the seeds has grown better than any other.`)
                         .conversions([
-                            conversion()
-                                .id(`farmingHarvesting`)
-                                .inputs([items.workForce(4, [modi(`irrigation`, 0.1)])])
-                                .outputs([items.food(5, [modi(`irrigation`, 0.25)])])
+                            conversion(`farmingHarvesting`)
+                                .inputs([items.workForce(4, [modi(`irrigation`, 0.1)]), items.metal(0, [modi(`metalTools`, 0.1)])])
+                                .outputs([items.food(5, [modi(`irrigation`, 0.25), modi(`metalTools`, 0.5)])])
                                 .complete()
                         ])
                         .button("build", "Sow more land",
-                            conversion()
-                                .id(`farmingSowMoreLand`)
+                            conversion(`farmingSowMoreLand`)
                                 .inputs([items.land(1)])
                                 .modifier(`completions`, `farmsBuilt`)
                                 .complete()
@@ -68,9 +64,8 @@ export const foraging = (items: Items) => {
             Some have made small trenches for the water to flow deeper in towards the crops.`)
                 .unlockConditions([unlock(modi(`farmsBuilt`), "more", 5)])
                 .button("build", "Invest in digging more trenches",
-                    conversion()
-                        .id(`irrigationDigMore`)
-                        .inputs([items.localWater(1, [modi(`irrigation`, 0.5)])])
+                    conversion(`irrigationDigMore`)
+                        .inputs([items.localWater(1, [modi(`irrigation`, 0.5)]), items.workForce(5, [modi(`irrigation`, 5)])])
                         .modifier(`completions`, `irrigation`)
                         .complete()
                 )

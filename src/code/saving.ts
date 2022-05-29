@@ -49,13 +49,10 @@ export function saveModuleHandler(handler: ModuleHandler) {
     })
 
     window.localStorage.setItem(`saveFile`, JSON.stringify(jsonSaver))
-    console.log(jsonSaver)
 }
 
 export function loadSaveFile(file: any, handler: ModuleHandler) {
     const jsonSave = JSON.parse(file) as SaveObject
-
-    console.log(jsonSave)
     //Load Items
     jsonSave.items.forEach((ite) => {
         const item = handler.items[ite.id as keyof Items]()
@@ -67,7 +64,6 @@ export function loadSaveFile(file: any, handler: ModuleHandler) {
     jsonSave.modules.forEach((mod) => {
         const module = handler.modules.get(mod.id)
         if (module) {
-            console.log(mod.transformHistory)
             mod.transformHistory.forEach((tra) => {
 
                 module.transform(tra)
@@ -89,7 +85,7 @@ export function loadSaveFile(file: any, handler: ModuleHandler) {
             conversion.amount = con.amount
             conversion.completions = con.completions
         }
-        else console.warn(`Unable to find module ${con.id}`)
+        else console.warn(`Unable to find conversion ${con.id}`)
     })
 
     //Load Modifiers

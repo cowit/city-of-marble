@@ -10,7 +10,12 @@ export function itemIcon(item: Item | ItemRef, parent: UIComponent | JQuery, con
     </div>
     `)
     const amountEle = comp.find(".conversion-amount")
-
+    if (!conversion) {
+        comp.append(/*html*/`<p class="conversion-amount item-display-text" capacity>/${item.capacity}</p>`)
+        amountEle.addClass(`item-display-text`)
+        comp.hide()
+    }
+    const capacityEle = comp.find(".conversion-amount[capacity]")
     //Add the tooltip functions
     comp.on("mousemove", (event) => {
         tooltip.display(event, item.name)
@@ -19,15 +24,33 @@ export function itemIcon(item: Item | ItemRef, parent: UIComponent | JQuery, con
         tooltip.hide()
     })
 
+    if (conversion) {
+        item.onModifierChange.listen((e) => {
+            if (e.newAmount === 0) comp.hide()
+            else comp.show()
+        })
+    }
+
+
     //Subscribe to the change amount event to keep the icon updated.
     item.on("amountChange", (e) => {
+        if (!conversion) comp.show()
         if (conversion && conversion.current > 0) {
+
+
             e.newAmount *= conversion.current
         }
         var toShow = e.newAmount.toString()
         if (e.newAmount % 1 !== 0 && e.newAmount !== 0 && e.newAmount < 100) toShow = e.newAmount.toFixed(2)
         else if (e.newAmount > 100) toShow = Math.floor(e.newAmount).toString()
         amountEle.text(toShow)
+        if (e.item.capacity > 0) {
+            capacityEle.show()
+            capacityEle.text(`\\ ${Math.floor(e.item.capacity)}`)
+        }
+        else {
+            capacityEle.hide()
+        }
     })
     var uic
     if (parent instanceof UIComponent) {

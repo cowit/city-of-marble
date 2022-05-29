@@ -83,6 +83,10 @@
     margin: 2px 6px 0 2px;
 }
 
+.item-display-text {
+    width: 125px;
+}
+
 .con-arrow {
     height: 25px;
     font-size: 25px;

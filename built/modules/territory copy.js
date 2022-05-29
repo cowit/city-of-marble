@@ -9,7 +9,8 @@ export const territory = (items) => {
             .description(`You are a small group of hunter-gatherers trying to survive and grow.
                 <br>(Click the button below to forage for some food and explore the land.)`)
             .conversions([])
-            .button("trigger", "Explore for more land to forage", conversion(`exploreButton`)
+            .button("trigger", "Explore for more land to forage", conversion()
+            .id(`exploreButton`)
             .inputs([items.unexploredLand(1)])
             .outputs([items.land(1), items.localWater(1), items.wood(1)])
             .modifier(1, `exploredLand`)
@@ -19,7 +20,8 @@ export const territory = (items) => {
             .description(`Outside of the boundary of the city, mostly unprotected and uncontrolled.
                 Your people travel out there to collect the things they need, it could be beneficial to have patrols protecting them.`)
             .conversions([
-            conversion(`outskirtsWood`)
+            conversion()
+                .id(`outskirtsWood`)
                 .amount(1)
                 .inputs([items.workForce(3)])
                 .outputs([items.wood(1)])
@@ -33,11 +35,13 @@ export const territory = (items) => {
             .description(`Set up temporary camps to return to.
                 <br> (Each piece of land you have visited can support 1 more camp.)`)
             .unlockConditions([unlock(items.land(), "more", 5)])
-            .button("build", "Set up another camp", conversion(`setUpAnotherCamp`)
+            .button("build", "Set up another camp", conversion()
+            .id(`setUpAnotherCamp`)
             .inputs([items.land(1)])
             .outputs([items.housing(1)])
             .complete())
-            .button("trigger", "The beginnings of a city..", conversion(`startCity`)
+            .button("trigger", "The beginnings of a city..", conversion()
+            .id(`startCity`)
             .inputs([items.housing(20, [], true)])
             .complete(), `city`)
             .transform(`city`, module()
@@ -45,7 +49,8 @@ export const territory = (items) => {
             .description(`The largest of the encampments that was settled at a particularly fertile area has grown into a City!
                 This achievement has attracted people from from all around the region.
                 Your population will now grow faster and their housing will begin to get more compact with better materials being used..`)
-            .button("build", "Building more housing", conversion(`cityBuildHouse`)
+            .button("build", "Building more housing", conversion()
+            .id(`cityBuildHouse`)
             .inputs([items.land(0.2), items.wood(5)])
             .outputs([items.housing(1)])
             .modifier(`completions`, `cityLevel`)
@@ -58,12 +63,14 @@ export const territory = (items) => {
                  As your population grows you will will be able to have a larger workforce.`)
             .unlockConditions([unlock(items.housing(), "more", 2)])
             .conversions([
-            conversion(`popGrowthPops`)
+            conversion()
+                .id(`popGrowthPops`)
                 .inputs([items.food(1)])
                 .outputs([items.population(0.1, [modi(`cityLevel`, 0.1)])])
                 .amount(1)
                 .complete(),
-            conversion(`popGrowthWorkForce`)
+            conversion()
+                .id(`popGrowthWorkForce`)
                 .inputs([items.food(1)])
                 .outputs([items.workForce(1, [modi(`cityLevel`)])])
                 .amount(1)
@@ -72,4 +79,4 @@ export const territory = (items) => {
             .complete()
     ]);
 };
-//# sourceMappingURL=territory.js.map
+//# sourceMappingURL=territory%20copy.js.map

@@ -116,7 +116,7 @@ function itemAccessor(id, name) {
         itemIcon(item, $(".items-display"));
     }
     function quickAccess(refAmount, modifiers, dontConsume = false) {
-        if (refAmount) {
+        if (refAmount !== undefined) {
             return new ItemRef(item, refAmount, modifiers, dontConsume);
         }
         else
@@ -134,6 +134,8 @@ export class Items {
         this.land = itemAccessor("land", "Land");
         this.localWater = itemAccessor("localWater", "Local Water");
         this.wood = itemAccessor("wood", "Wood");
+        this.metalOre = itemAccessor("metalOre", "Metal Ore");
+        this.metal = itemAccessor("metal", "Metal");
         this.population().addCapacity(this.housing(), 5);
         this.workForce().addCapacity(this.population());
     }

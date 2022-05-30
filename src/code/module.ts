@@ -130,8 +130,8 @@ export class ModuleButton {
     ) { }
 }
 
-export function module() {
-    return new ModuleArguments()
+export function module(id: string) {
+    return new ModuleArguments().id(id)
 }
 
 //The module is what the base interface which interacts with the planet.
@@ -156,7 +156,7 @@ export class Module {
         public unlockConditions: UnlockCondition[] = [],
         public unlocked: boolean = true
     ) {
-        if (unlockConditions.length > 0) this.unlocked = false
+        //if (unlockConditions.length > 0) this.unlocked = false
     }
 
     //Called on each activation cycle

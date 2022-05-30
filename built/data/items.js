@@ -136,6 +136,7 @@ export class Items {
         this.wood = itemAccessor("wood", "Wood");
         this.metalOre = itemAccessor("metalOre", "Metal Ore");
         this.metal = itemAccessor("metal", "Metal");
+        this.stone = itemAccessor("stone", "Stone");
         this.population().addCapacity(this.housing(), 5);
         this.workForce().addCapacity(this.population());
     }

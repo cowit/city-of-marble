@@ -116,8 +116,8 @@ export class ModuleButton {
         this.transform = transform;
     }
 }
-export function module() {
-    return new ModuleArguments();
+export function module(id) {
+    return new ModuleArguments().id(id);
 }
 //The module is what the base interface which interacts with the planet.
 export class Module {
@@ -138,8 +138,7 @@ export class Module {
         this.modifiers = new ModifierHandler();
         //History of transforms used for saving
         this.transformHistory = [];
-        if (unlockConditions.length > 0)
-            this.unlocked = false;
+        //if (unlockConditions.length > 0) this.unlocked = false
     }
     //Called on each activation cycle
     activate(planet) {

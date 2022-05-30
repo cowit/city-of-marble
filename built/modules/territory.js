@@ -3,8 +3,7 @@ import { modi } from "../modifiers.js";
 import { module, ModuleExporter, unlock } from "../module.js";
 export const territory = (items) => {
     return new ModuleExporter("territory", [
-        module()
-            .id("explore")
+        module(`explore`)
             .name("Exploring")
             .description(`You are a small group of hunter-gatherers trying to survive and grow.
                 <br>(Click the button below to forage for some food and explore the land.)`)
@@ -14,7 +13,7 @@ export const territory = (items) => {
             .outputs([items.land(1), items.localWater(1), items.wood(1)])
             .modifier(1, `exploredLand`)
             .complete())
-            .transform(`outskirts`, module()
+            .transform(`outskirts`, module(`outskirts`)
             .name(`Outskirts`)
             .description(`Outside of the boundary of the city, mostly unprotected and uncontrolled.
                 Your people travel out there to collect the things they need, it could be beneficial to have patrols protecting them.`)
@@ -27,8 +26,7 @@ export const territory = (items) => {
         ])
             .unlockConditions([unlock(items.unexploredLand(), "equals", 0)]))
             .complete(),
-        module()
-            .id("shelter")
+        module(`shelter`)
             .name("Set Up Camp")
             .description(`Set up temporary camps to return to.
                 <br> (Each piece of land you have visited can support 1 more camp.)`)
@@ -40,8 +38,7 @@ export const territory = (items) => {
             .button("trigger", "The beginnings of a city..", conversion(`startCity`)
             .inputs([items.housing(20, [], true)])
             .complete(), `city`)
-            .transform(`city`, module()
-            .name("City")
+            .transform(`city`, module(`city`)
             .description(`The largest of the encampments that was settled at a particularly fertile area has grown into a City!
                 This achievement has attracted people from from all around the region.
                 Your population will now grow faster and their housing will begin to get more compact with better materials being used..`)
@@ -51,8 +48,7 @@ export const territory = (items) => {
             .modifier(`completions`, `cityLevel`)
             .complete()))
             .complete(),
-        module()
-            .id("populationGrowth")
+        module(`populationGrowth`)
             .name("Growing Population")
             .description(`Your group is beginning to grow now.
                  As your population grows you will will be able to have a larger workforce.`)

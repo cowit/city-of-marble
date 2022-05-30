@@ -142,6 +142,7 @@ export class Items {
     wood = itemAccessor("wood", "Wood")
     metalOre = itemAccessor("metalOre", "Metal Ore")
     metal = itemAccessor("metal", "Metal")
+    stone = itemAccessor("stone", "Stone")
 
     constructor() {
         this.population().addCapacity(this.housing(), 5)

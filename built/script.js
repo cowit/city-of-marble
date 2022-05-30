@@ -1,13 +1,15 @@
 import { Game } from "./game.js";
 import { foraging } from "./modules/food.js";
-import { production } from "./modules/production.js";
+import { metal } from "./modules/metal.js";
+import { stone } from "./modules/stone.js";
 import { territory } from "./modules/territory.js";
 import { loadSaveFile, saveModuleHandler } from "./saving.js";
 globalThis.game = new Game();
 const earth = game.createPlanet("Earth");
 earth.addModuleLine(territory);
 earth.addModuleLine(foraging);
-earth.addModuleLine(production);
+earth.addModuleLine(metal);
+earth.addModuleLine(stone);
 earth.items.unexploredLand().amount(10);
 //earth.items.land().amount(100)
 //earth.items.housing().amount(100)

@@ -12,9 +12,9 @@ earth.addModuleLine(metal);
 earth.addModuleLine(stone);
 earth.items.unexploredLand().amount(10);
 //earth.items.land().amount(100)
-//earth.items.housing().amount(100)
-//earth.items.population().amount(100)
-//earth.items.workForce().amount(100)
+earth.items.housing().amount(5);
+earth.items.population().amount(5);
+earth.items.labor().amount(25);
 const tooltipEle = $(`#tooltip`);
 const tooltipName = $(`.tooltip-name`);
 globalThis.tooltip = {

@@ -42,7 +42,7 @@ export const foraging = (items: Items) => {
                         This years growth in the area that you planted the seeds has grown better than any other.`)
                         .conversions([
                             conversion(`farmingHarvesting`)
-                                .inputs([items.workForce(4, [modi(`irrigation`, 0.1)]), items.metal(0, [modi(`metalTools`, 0.1)])])
+                                .inputs([items.labor(4, [modi(`irrigation`, 0.1)]), items.metal(0, [modi(`metalTools`, 0.05)])])
                                 .outputs([items.food(4.5, [modi(`irrigation`, 0.20), modi(`metalTools`, 0.5)])])
                                 .complete()
                         ])
@@ -62,7 +62,7 @@ export const foraging = (items: Items) => {
                 .unlockConditions([unlock(modi(`farmsBuilt`), "more", 5)])
                 .button("build", "Invest in digging more trenches",
                     conversion(`irrigationDigMore`)
-                        .inputs([items.localWater(1, [modi(`irrigation`, 0.5)]), items.workForce(5, [modi(`irrigation`, 5)])])
+                        .inputs([items.localWater(1, [modi(`irrigation`, 0.5)]), items.labor(5, [modi(`irrigation`, 5)])])
                         .modifier(`completions`, `irrigation`)
                         .complete()
                 )

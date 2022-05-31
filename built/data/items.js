@@ -129,7 +129,7 @@ export class Items {
         this.food = itemAccessor("food", "Food");
         this.housing = itemAccessor("housing", "Housing");
         this.population = itemAccessor("population", "Population");
-        this.workForce = itemAccessor("workForce", "Work Force");
+        this.labor = itemAccessor("labor", "Labor");
         this.unexploredLand = itemAccessor("unexploredLand", "Unexplored Land");
         this.land = itemAccessor("land", "Land");
         this.localWater = itemAccessor("localWater", "Local Water");
@@ -138,7 +138,7 @@ export class Items {
         this.metal = itemAccessor("metal", "Metal");
         this.stone = itemAccessor("stone", "Stone");
         this.population().addCapacity(this.housing(), 5);
-        this.workForce().addCapacity(this.population());
+        this.labor().addCapacity(this.population());
     }
 }
 //# sourceMappingURL=items.js.map

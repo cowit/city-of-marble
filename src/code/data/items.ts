@@ -135,7 +135,7 @@ export class Items {
     food = itemAccessor("food", "Food")
     housing = itemAccessor("housing", "Housing")
     population = itemAccessor("population", "Population")
-    workForce = itemAccessor("workForce", "Work Force")
+    labor = itemAccessor("labor", "Labor")
     unexploredLand = itemAccessor("unexploredLand", "Unexplored Land")
     land = itemAccessor("land", "Land")
     localWater = itemAccessor("localWater", "Local Water")
@@ -146,7 +146,7 @@ export class Items {
 
     constructor() {
         this.population().addCapacity(this.housing(), 5)
-        this.workForce().addCapacity(this.population())
+        this.labor().addCapacity(this.population())
     }
 }
 

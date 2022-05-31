@@ -8,7 +8,7 @@ export const metal = (items) => {
                 Flecked with small blue patches of corrosion dot the surface. Your people seem to enjoy collecting the nuggets.`)
             .conversions([
             conversion(`metalMining`)
-                .inputs([items.workForce(5)])
+                .inputs([items.labor(5)])
                 .outputs([items.metalOre(1)])
                 .complete()
         ])

@@ -26,10 +26,22 @@ export const territory = (items: Items) => {
                         .conversions([
                             conversion(`outskirtsWood`)
                                 .amount(1)
-                                .inputs([items.workForce(3)])
-                                .outputs([items.wood(1)])
+                                .inputs([items.labor(5), items.metal(0, [modi(`metalTools`, 0.05)])])
+                                .outputs([items.wood(1, [modi(`outskirtPatrols`, 0.5), modi(`metalTools`, 0.5)])])
                                 .complete()
                         ])
+                        .button(`build`, `Increase lumber outposts`,
+                            conversion(`buildLumberOutpost`)
+                                .inputs([items.labor(20)])
+                                .complete()
+
+                        )
+                        .button("trigger", `Arm more patrols`,
+                            conversion(`outskirtPatrolsButton`)
+                                .inputs([items.labor(10), items.metal(10)])
+                                .modifier(`completions`, `outskirtPatrols`)
+                                .complete()
+                        )
                         .unlockConditions([unlock(items.unexploredLand(), "equals", 0)])
                 )
 
@@ -77,7 +89,7 @@ export const territory = (items: Items) => {
                         .complete(),
                     conversion(`popGrowthWorkForce`)
                         .inputs([items.food(1)])
-                        .outputs([items.workForce(1, [modi(`cityLevel`)])])
+                        .outputs([items.labor(1, [modi(`cityLevel`)])])
                         .amount(1)
                         .complete()
                 ])

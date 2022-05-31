@@ -2,6 +2,7 @@ import { Game } from "./game.js";
 import { foraging } from "./modules/food.js";
 import { metal } from "./modules/metal.js";
 import { stone } from "./modules/stone.js";
+import { temple } from "./modules/temple.js";
 import { territory } from "./modules/territory.js";
 import { loadSaveFile, saveModuleHandler } from "./saving.js";
 globalThis.game = new Game();
@@ -10,6 +11,7 @@ earth.addModuleLine(territory);
 earth.addModuleLine(foraging);
 earth.addModuleLine(metal);
 earth.addModuleLine(stone);
+earth.addModuleLine(temple);
 earth.items.unexploredLand().amount(10);
 //earth.items.land().amount(100)
 earth.items.housing().amount(5);

@@ -13,15 +13,12 @@ export const stone = (items: Items) => {
                 A quarry will supply what is needed.`)
                 .conversions([
                     conversion(`stoneQuarrying`)
-                        .inputs([items.labor(10, [modi(`quarryRoads`, 0.5)]), items.metal(0, [modi(`metalTools`, 0.05)])])
+                        .inputs([items.labor(5, [modi(`quarryRoads`, -0.5), modi(`quarryDepletions`, 0.1), modi(`passiveQuarries`, 0.1)]), items.metal(0, [modi(`metalTools`, 0.05)])])
                         .outputs([items.stone(1, [modi(`metalTools`, 0.5)])])
+                        .modifier(`completions`, `quarryDepletions`)
+                        .amount(1)
                         .complete()
                 ])
-                .button(`build`, `Build Quarries`,
-                    conversion(`buildQuarries`)
-                        .inputs([items.labor(50), items.wood(25)])
-                        .complete()
-                )
                 .complete(),
             module(`quarryTransport`)
                 .name(`Transportation`)
@@ -31,7 +28,20 @@ export const stone = (items: Items) => {
                     conversion(`quarryRoadsButton`)
                         .amount(1)
                         .inputs([items.labor(25, [modi(`quarryRoads`, 10)]), items.wood(15)])
-                        .modifier(`completions`, `quarryRoads`)
+                        .modifier(1, `quarryRoads`)
+                        .complete()
+                )
+                .complete(),
+            module(`newQuarry`)
+                .name(`Create new Quarry`)
+                .description(`Quarries will slowly deplete over time. Begin the construction of a new quarry which will have to be improved again.
+                Previous quarries will always provide a passive trickle of stone.`)
+                .button(`trigger`, `Start new quarry`,
+                    conversion(`newQuarry`)
+                        .inputs([items.land(1)])
+                        .modifier(1, `passiveQuarries`)
+                        .modifier('clear', `quarryRoads`)
+                        .modifier('clear', `quarryRoads`)
                         .complete()
                 )
                 .complete()

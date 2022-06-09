@@ -100,6 +100,9 @@ export class Conversion {
                     else if (mS.value === "current") {
                         game.currentPlanet().globalModifiers.set(mS.modifierID, this.id, this.current);
                     }
+                    else if (mS.value === "clear") {
+                        game.currentPlanet().globalModifiers.set(mS.modifierID, this.id, 0);
+                    }
                     else if (typeof mS.value === "number") {
                         game.currentPlanet().globalModifiers.set(mS.modifierID, this.id, mS.value, true);
                     }

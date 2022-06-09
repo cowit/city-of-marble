@@ -75,7 +75,12 @@ export class ItemRef extends Item {
         this._amount = refAmount;
         if (modifiers && modifiers.length > 0) {
             modifiers.forEach((mod) => {
-                this.totalVar = game.currentPlanet().globalModifiers.subscribe(mod, this._amount);
+                if (this.totalVar) {
+                    this.totalVar = game.currentPlanet().globalModifiers.subscribe(mod, this.totalVar);
+                }
+                else {
+                    this.totalVar = game.currentPlanet().globalModifiers.subscribe(mod, this._amount);
+                }
             });
             (_a = this.totalVar) === null || _a === void 0 ? void 0 : _a.onModifierChange.listen(() => {
                 //Called when a modifier is changed
@@ -137,8 +142,9 @@ export class Items {
         this.metalOre = itemAccessor("metalOre", "Metal Ore");
         this.metal = itemAccessor("metal", "Metal");
         this.stone = itemAccessor("stone", "Stone");
+        this.temple = itemAccessor(`temple`, `Temple Progress`);
         this.population().addCapacity(this.housing(), 5);
-        this.labor().addCapacity(this.population());
+        this.labor().addCapacity(this.population(), 5);
     }
 }
 //# sourceMappingURL=items.js.map

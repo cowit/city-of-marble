@@ -69,13 +69,19 @@ export class Item {
 }
 
 export class ItemRef extends Item {
-    totalVar?: ModifiableVariable<number | string>
+    totalVar?: ModifiableVariable<number>
     constructor(public item: Item, refAmount: number, public modifiers?: ModifierReference[], public dontConsume: boolean = false) {
         super(item.id, item.name, item.icon)
         this._amount = refAmount
         if (modifiers && modifiers.length > 0) {
             modifiers.forEach((mod) => {
-                this.totalVar = game.currentPlanet().globalModifiers.subscribe(mod, this._amount)
+                if (this.totalVar) {
+                    this.totalVar = game.currentPlanet().globalModifiers.subscribe(mod, this.totalVar)
+                }
+                else {
+                    this.totalVar = game.currentPlanet().globalModifiers.subscribe(mod, this._amount)
+                }
+
             })
             this.totalVar?.onModifierChange.listen(() => {
                 //Called when a modifier is changed
@@ -143,10 +149,11 @@ export class Items {
     metalOre = itemAccessor("metalOre", "Metal Ore")
     metal = itemAccessor("metal", "Metal")
     stone = itemAccessor("stone", "Stone")
+    temple = itemAccessor(`temple`, `Temple Progress`)
 
     constructor() {
         this.population().addCapacity(this.housing(), 5)
-        this.labor().addCapacity(this.population())
+        this.labor().addCapacity(this.population(), 5)
     }
 }
 

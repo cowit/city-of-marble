@@ -15,15 +15,16 @@ declare global {
 }
 const earth = game.createPlanet("Earth")
 earth.addModuleLine(territory)
-earth.addModuleLine(foraging)
+//earth.addModuleLine(foraging)
 earth.addModuleLine(metal)
 earth.addModuleLine(stone)
 earth.addModuleLine(temple)
 earth.items.unexploredLand().amount(10)
 //earth.items.land().amount(100)
-earth.items.housing().amount(5)
-earth.items.population().amount(5)
-earth.items.labor().amount(25)
+earth.items.housing().amount(50)
+earth.items.population().amount(50)
+earth.items.labor().amount(250)
+earth.items.wood().amount(100)
 
 
 

@@ -64,6 +64,7 @@ export const territory = (items: Items) => {
                 )
                 .transform(`city`,
                     module(`city`)
+                        .name(`City`)
                         .description(`The largest of the encampments that was settled at a particularly fertile area has grown into a City!
                 This achievement has attracted people from from all around the region.
                 Your population will now grow faster and their housing will begin to get more compact with better materials being used..`)
@@ -83,9 +84,10 @@ export const territory = (items: Items) => {
                 .unlockConditions([unlock(items.housing(), "more", 2)])
                 .conversions([
                     conversion(`popGrowthPops`)
-                        .inputs([items.food(1)])
+                        .inputs([])
                         .outputs([items.population(0.1, [modi(`cityLevel`, 0.1)])])
                         .amount(1)
+                        .hideButtons()
                         .complete(),
                     conversion(`popGrowthWorkForce`)
                         .inputs([items.food(1)])

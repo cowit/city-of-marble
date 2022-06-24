@@ -8,10 +8,12 @@ export function itemIcon(item, parent, conversion) {
     const amountEle = comp.find(".conversion-amount");
     if (!conversion) {
         comp.append(/*html*/ `<p class="conversion-amount item-display-text" capacity>/${item.capacity}</p>`);
+        comp.append(/*html*/ `<p class="conversion-amount item-display-text" current>${item.amountChange.current}</p>`);
         amountEle.addClass(`item-display-text`);
         comp.hide();
     }
     const capacityEle = comp.find(".conversion-amount[capacity]");
+    const currentEle = comp.find(".conversion-amount[current]");
     //Add the tooltip functions
     comp.on("mousemove", (event) => {
         tooltip.display(event, item.name);
@@ -40,6 +42,7 @@ export function itemIcon(item, parent, conversion) {
         else if (e.newAmount > 100)
             toShow = Math.floor(e.newAmount).toString();
         amountEle.text(toShow);
+        //Display the current capacity
         if (e.item.capacity > 0) {
             capacityEle.show();
             capacityEle.text(`\\ ${Math.floor(e.item.capacity)}`);
@@ -48,6 +51,22 @@ export function itemIcon(item, parent, conversion) {
             capacityEle.hide();
         }
     });
+    //Subscribe and change UI when the item is activated
+    if (!conversion) {
+        item.on(`activation`, (e) => {
+            var toShow = item.amountChange.current;
+            if (e.newAmount % 1 !== 0 && e.newAmount !== 0 && e.newAmount < 100)
+                toShow = toShow.toFixed(2);
+            else if (e.newAmount > 100)
+                toShow = Math.floor(toShow).toString();
+            //Display the current changes
+            if (item.amountChange.current > 0) {
+                currentEle.text("+" + toShow);
+            }
+            else
+                currentEle.text(toShow);
+        });
+    }
     var uic;
     if (parent instanceof UIComponent) {
         uic = new UIComponent(comp, parent);
@@ -96,7 +115,7 @@ export class UIComponent {
             
         </div>
         `);
-        if (!isButton) {
+        if (!isButton && con.displayButtons) {
             comp.append(/*html*/ `
             <div class="amount-controls">
                 <p class="square-button button" minus><i class="fa-solid fa-minus"></i></p>
@@ -219,6 +238,7 @@ export class ModuleLine extends UIComponent {
         <div class="module-wrapper fade">
             <div class="module-name">
             <p class="module-name-text">${mod.name}</p>
+            <i class="fa-solid fa-circle-exclamation unlock-marker"></i>
             </div>
             
             <p class="module-description">${mod.description}</p>
@@ -230,6 +250,7 @@ export class ModuleLine extends UIComponent {
         mod.uiComponent = uic;
         uic.parent = this;
         this.element.append(comp);
+        const unlockMarker = comp.find(".unlock-marker").hide();
         if (this.children.length > 0) {
             const modLine = $(/*html*/ ` <p class="module-connector fade">|</p>`);
             uic.secondaryComponents.push(modLine);
@@ -243,6 +264,14 @@ export class ModuleLine extends UIComponent {
                 uic.moduleButton(but, mod);
             });
         }
+        //When the module is unlocked
+        mod.onUnlock.listen(() => {
+            unlockMarker.show();
+        });
+        //When this module is hovered over, hide the unlock marker.
+        comp.on('mouseenter', () => {
+            unlockMarker.hide();
+        });
         mod.onTransform.listen(() => {
             comp.find(`.module-name-text`).text(mod.name);
             comp.find(`.module-description`).text(mod.description);

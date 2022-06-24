@@ -16,7 +16,10 @@ export class ModuleHandler {
     }
 
     activate() {
-        this.modules.forEach(mod => { mod.activate(this) })
+        this.modules.forEach(mod => { mod.activate() })
+        for (const item in this.items) {
+            this.items[item as keyof Items]().activate()
+        }
     }
 
     addModuleLine(createModEx: ((item: Items) => ModuleExporter)) {

@@ -139,6 +139,8 @@ export class Module {
     uiComponent?: UIComponent
     //Event handler which is triggered when the transform method is complete.
     onTransform = new EventHandler<Module>()
+    //Called when this is unlocked
+    onUnlock = new EventHandler<Module>()
     //Modifier handler which allows accessing and setting modifiers at different points.
     modifiers = new ModifierHandler<number | string>()
     //Transform ID used for saving
@@ -156,11 +158,11 @@ export class Module {
         public unlockConditions: UnlockCondition[] = [],
         public unlocked: boolean = true
     ) {
-        //if (unlockConditions.length > 0) this.unlocked = false
+        if (unlockConditions.length > 0) this.unlocked = false
     }
 
     //Called on each activation cycle
-    activate(planet: ModuleHandler) {
+    activate() {
         //Check the unlock conditions. If all succeed this module will be unlocked.
         if (!this.unlocked && this.unlockConditions.length > 0) {
             this.checkUnlocks()
@@ -194,7 +196,10 @@ export class Module {
         this.unlockConditions.forEach((uC) => {
             if (uC.check() === false) allTrue = false
         })
-        if (allTrue) this.unlock()
+        if (allTrue) {
+            this.unlock()
+            this.onUnlock.trigger(this)
+        }
     }
 
     unlock() {

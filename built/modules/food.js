@@ -32,6 +32,7 @@ export const foraging = (items) => {
                         This years growth in the area that you planted the seeds has grown better than any other.`)
             .conversions([
             conversion(`farmingHarvesting`)
+                .amount(1)
                 .inputs([items.labor(4, [modi(`irrigation`, 0.1)]), items.metal(0, [modi(`metalTools`, 0.05)])])
                 .outputs([items.food(4.5, [modi(`irrigation`, 0.20), modi(`metalTools`, 0.5)])])
                 .complete()

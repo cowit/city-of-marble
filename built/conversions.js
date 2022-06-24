@@ -10,6 +10,7 @@ export class ConversionArguments {
         this._inputs = [];
         this._outputs = [];
         this._modifierSelectors = [];
+        this._displayButtons = true;
     }
     inputs(inputs) {
         this._inputs = inputs;
@@ -35,12 +36,16 @@ export class ConversionArguments {
         this._id = id;
         return this;
     }
+    hideButtons() {
+        this._displayButtons = false;
+        return this;
+    }
     complete() {
         if (!this._id) {
             console.error(`No ID found for conversion. `, this);
             throw new Error(`No ID given.`);
         }
-        const con = new Conversion(this._id, this._inputs, this._outputs, this._modifierSelectors, this._onFinish, this._amount);
+        const con = new Conversion(this._id, this._inputs, this._outputs, this._modifierSelectors, this._onFinish, this._amount, this._displayButtons);
         game.currentPlanet().conversions.set(this._id, con);
         return con;
     }
@@ -51,12 +56,13 @@ export function conversion(id) {
     return conArg;
 }
 export class Conversion {
-    constructor(id, inputs, outputs, modifierSelectors, onFinish, amount = 0) {
+    constructor(id, inputs, outputs, modifierSelectors, onFinish, amount = 0, displayButtons = true) {
         this.id = id;
         this.inputs = inputs;
         this.outputs = outputs;
         this.modifierSelectors = modifierSelectors;
         this.onFinish = onFinish;
+        this.displayButtons = displayButtons;
         this.amount = 0;
         this.current = 0;
         this.completions = 0;
@@ -65,7 +71,7 @@ export class Conversion {
     }
     checkConversion(complete) {
         //The maximum amount of conversion activations that can happen.
-        let maxConversions = this.amount;
+        let maxConversions = this.current;
         //Reduce maxConversions to the input that can make the fewest activations.
         this.inputs.forEach(inp => {
             if (inp.total() > 0) {
@@ -88,26 +94,7 @@ export class Conversion {
                 this.onFinish();
             if (complete)
                 complete();
-            if (this.modifierSelectors.length > 0) {
-                this.modifierSelectors.forEach((mS) => {
-                    //If the value selector is amount, replace it with the amount of this conversion.
-                    if (mS.value === "amount") {
-                        game.currentPlanet().globalModifiers.set(mS.modifierID, this.id, this.amount);
-                    }
-                    else if (mS.value === "completions") {
-                        game.currentPlanet().globalModifiers.set(mS.modifierID, this.id, this.completions);
-                    }
-                    else if (mS.value === "current") {
-                        game.currentPlanet().globalModifiers.set(mS.modifierID, this.id, this.current);
-                    }
-                    else if (mS.value === "clear") {
-                        game.currentPlanet().globalModifiers.set(mS.modifierID, this.id, 0);
-                    }
-                    else if (typeof mS.value === "number") {
-                        game.currentPlanet().globalModifiers.set(mS.modifierID, this.id, mS.value, true);
-                    }
-                });
-            }
+            this.setModifiers();
         }
     }
     build(amount = 1) {
@@ -131,6 +118,7 @@ export class Conversion {
         this.outputs.forEach((out) => {
             out.trigger(`amountChange`);
         });
+        this.setModifiers();
     }
     decreaseCurrent(amount = 1) {
         amount = Math.min(this.current, amount);
@@ -142,6 +130,29 @@ export class Conversion {
         this.outputs.forEach((out) => {
             out.trigger(`amountChange`);
         });
+        this.setModifiers();
+    }
+    setModifiers() {
+        if (this.modifierSelectors.length > 0) {
+            this.modifierSelectors.forEach((mS) => {
+                //If the value selector is amount, replace it with the amount of this conversion.
+                if (mS.value === "amount") {
+                    game.currentPlanet().globalModifiers.set(mS.modifierID, this.id, this.amount);
+                }
+                else if (mS.value === "completions") {
+                    game.currentPlanet().globalModifiers.set(mS.modifierID, this.id, this.completions);
+                }
+                else if (mS.value === "current") {
+                    game.currentPlanet().globalModifiers.set(mS.modifierID, this.id, this.current);
+                }
+                else if (mS.value === "clear") {
+                    game.currentPlanet().globalModifiers.set(mS.modifierID, this.id, 0);
+                }
+                else if (typeof mS.value === "number") {
+                    game.currentPlanet().globalModifiers.set(mS.modifierID, this.id, mS.value, true);
+                }
+            });
+        }
     }
 }
 //# sourceMappingURL=conversions.js.map

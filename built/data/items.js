@@ -14,16 +14,27 @@ export class Item {
         //Main Variables
         this._amount = 0;
         this.capacity = 0;
+        this.amountChange = {
+            current: 0,
+            next: 0
+        };
         this.capacities = new Map();
         this.unlocked = true;
         //Events
         this.onAmountChange = new EventHandler();
         this.onTotalChange = new EventHandler();
         this.onModifierChange = new EventHandler();
+        this.onActivation = new EventHandler();
         this.events = new Map()
             .set(`amountChange`, this.onAmountChange)
             .set(`totalChange`, this.onTotalChange)
-            .set(`modifierChange`, this.onModifierChange);
+            .set(`modifierChange`, this.onModifierChange)
+            .set(`activation`, this.onActivation);
+    }
+    activate() {
+        this.amountChange.current = this.amountChange.next;
+        this.amountChange.next = 0;
+        this.trigger(`activation`);
     }
     checkAmount(divisor) {
         //If a divisor is passed, divide the number by that amount. Else return the amount.
@@ -47,6 +58,7 @@ export class Item {
     }
     add(addend) {
         this.amount(this._amount + addend);
+        this.amountChange.next += addend;
         return this;
     }
     on(eventType, callback) {
@@ -143,6 +155,7 @@ export class Items {
         this.metal = itemAccessor("metal", "Metal");
         this.stone = itemAccessor("stone", "Stone");
         this.temple = itemAccessor(`temple`, `Temple Progress`);
+        this.diplomaticFavor = itemAccessor(`diplomatic`, `Diplomatic Favor`);
         this.population().addCapacity(this.housing(), 5);
         this.labor().addCapacity(this.population(), 5);
     }

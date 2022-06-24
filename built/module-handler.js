@@ -12,7 +12,10 @@ export class ModuleHandler {
         this.conversions = new Map();
     }
     activate() {
-        this.modules.forEach(mod => { mod.activate(this); });
+        this.modules.forEach(mod => { mod.activate(); });
+        for (const item in this.items) {
+            this.items[item]().activate();
+        }
     }
     addModuleLine(createModEx) {
         const modEx = createModEx(this.items);

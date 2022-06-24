@@ -1,4 +1,5 @@
 import { Game } from "./game.js";
+import { diplomacy } from "./modules/diplomacy.js";
 import { foraging } from "./modules/food.js";
 import { metal } from "./modules/metal.js";
 import { stone } from "./modules/stone.js";
@@ -15,16 +16,17 @@ declare global {
 }
 const earth = game.createPlanet("Earth")
 earth.addModuleLine(territory)
-//earth.addModuleLine(foraging)
+earth.addModuleLine(foraging)
+earth.addModuleLine(diplomacy)
 earth.addModuleLine(metal)
 earth.addModuleLine(stone)
 earth.addModuleLine(temple)
 earth.items.unexploredLand().amount(10)
 //earth.items.land().amount(100)
-earth.items.housing().amount(50)
+earth.items.housing().amount(10)
 earth.items.population().amount(50)
-earth.items.labor().amount(250)
-earth.items.wood().amount(100)
+//earth.items.labor().amount(250)
+//earth.items.wood().amount(100)
 
 
 

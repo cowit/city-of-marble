@@ -80,7 +80,6 @@ export class ModifierCollection<modifierType> {
                 original.total = this.total[2]
                 original.onModifierChange.trigger(original.totalNumber)
 
-
             })
             return original
         }
@@ -91,6 +90,7 @@ export class ModifierCollection<modifierType> {
             this.modVariables.listen(() => {
                 modVar.totalNumber -= this.total[1] * modifierRef.multiplier
                 modVar.total = this.total[2]
+
                 modVar.onModifierChange.trigger(modVar.totalNumber)
             })
             return modVar

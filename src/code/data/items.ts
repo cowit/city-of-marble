@@ -9,8 +9,12 @@ class ItemEvent {
 
 export class Item {
     //Main Variables
-    public _amount: number = 0
-    public capacity: number = 0
+    public _amount = 0
+    public capacity = 0
+    public amountChange = {
+        current: 0,
+        next: 0
+    }
     protected capacities = new Map<string, Capacity>()
     public module?: Module
     public unlocked = true
@@ -19,12 +23,20 @@ export class Item {
     public onAmountChange = new EventHandler<ItemEvent>()
     public onTotalChange = new EventHandler<ItemEvent>()
     public onModifierChange = new EventHandler<ItemEvent>()
+    public onActivation = new EventHandler<ItemEvent>()
     protected events = new Map<string, EventHandler<ItemEvent>>()
         .set(`amountChange`, this.onAmountChange)
         .set(`totalChange`, this.onTotalChange)
         .set(`modifierChange`, this.onModifierChange)
+        .set(`activation`, this.onActivation)
 
     constructor(public id: string, public name: string, public icon: string) { }
+
+    activate() {
+        this.amountChange.current = this.amountChange.next
+        this.amountChange.next = 0
+        this.trigger(`activation`)
+    }
 
     checkAmount(divisor?: number) {
         //If a divisor is passed, divide the number by that amount. Else return the amount.
@@ -42,6 +54,7 @@ export class Item {
         //If the capacity is set to 0, uncap it. Otherwise cap it.
         if (this.capacities.size !== 0) newAmount = Math.min(this.capacity, newAmount)
         this._amount = newAmount
+
         //When the amount changes, call the amountChange event for all listeners.
         this.onAmountChange.trigger(new ItemEvent(this._amount, this))
         return this
@@ -49,16 +62,17 @@ export class Item {
 
     add(addend: number) {
         this.amount(this._amount + addend)
+        this.amountChange.next += addend
         return this
     }
 
-    on(eventType: "amountChange" | "totalChange" | "modifierChange", callback: ((event: ItemEvent) => void)) {
+    on(eventType: "amountChange" | "totalChange" | "modifierChange" | "activation", callback: ((event: ItemEvent) => void)) {
         var eventArray = this.events.get(eventType)
         if (!eventArray) console.error(`Event type ${eventType} does not exist.`)
         else eventArray.listen(callback)
     }
 
-    trigger(eventType: "amountChange" | "totalChange" | "modifierChange") {
+    trigger(eventType: "amountChange" | "totalChange" | "modifierChange" | "activation") {
         this.events.get(eventType)?.trigger(new ItemEvent(this._amount, this))
     }
 
@@ -150,6 +164,7 @@ export class Items {
     metal = itemAccessor("metal", "Metal")
     stone = itemAccessor("stone", "Stone")
     temple = itemAccessor(`temple`, `Temple Progress`)
+    diplomaticFavor = itemAccessor(`diplomatic`, `Diplomatic Favor`)
 
     constructor() {
         this.population().addCapacity(this.housing(), 5)

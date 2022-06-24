@@ -134,14 +134,17 @@ export class Module {
         this.unlocked = unlocked;
         //Event handler which is triggered when the transform method is complete.
         this.onTransform = new EventHandler();
+        //Called when this is unlocked
+        this.onUnlock = new EventHandler();
         //Modifier handler which allows accessing and setting modifiers at different points.
         this.modifiers = new ModifierHandler();
         //History of transforms used for saving
         this.transformHistory = [];
-        //if (unlockConditions.length > 0) this.unlocked = false
+        if (unlockConditions.length > 0)
+            this.unlocked = false;
     }
     //Called on each activation cycle
-    activate(planet) {
+    activate() {
         //Check the unlock conditions. If all succeed this module will be unlocked.
         if (!this.unlocked && this.unlockConditions.length > 0) {
             this.checkUnlocks();
@@ -173,8 +176,10 @@ export class Module {
             if (uC.check() === false)
                 allTrue = false;
         });
-        if (allTrue)
+        if (allTrue) {
             this.unlock();
+            this.onUnlock.trigger(this);
+        }
     }
     unlock() {
         var _a;

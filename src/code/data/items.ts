@@ -17,13 +17,14 @@ export class Item {
     }
     protected capacities = new Map<string, Capacity>()
     public module?: Module
-    public unlocked = true
+    public unlocked = false
 
     //Events
     public onAmountChange = new EventHandler<ItemEvent>()
     public onTotalChange = new EventHandler<ItemEvent>()
     public onModifierChange = new EventHandler<ItemEvent>()
     public onActivation = new EventHandler<ItemEvent>()
+    public onUnlockToggle = new EventHandler<boolean>()
     protected events = new Map<string, EventHandler<ItemEvent>>()
         .set(`amountChange`, this.onAmountChange)
         .set(`totalChange`, this.onTotalChange)
@@ -31,6 +32,16 @@ export class Item {
         .set(`activation`, this.onActivation)
 
     constructor(public id: string, public name: string, public icon: string) { }
+
+    lock() {
+        this.unlocked = false
+        this.onUnlockToggle.trigger(this.unlocked)
+    }
+
+    unlock() {
+        this.unlocked = true
+        this.onUnlockToggle.trigger(this.unlocked)
+    }
 
     activate() {
         this.amountChange.current = this.amountChange.next
@@ -51,6 +62,7 @@ export class Item {
     }
 
     amount(newAmount: number) {
+        this.unlock()
         //If the capacity is set to 0, uncap it. Otherwise cap it.
         if (this.capacities.size !== 0) newAmount = Math.min(this.capacity, newAmount)
         this._amount = newAmount
@@ -164,7 +176,7 @@ export class Items {
     metal = itemAccessor("metal", "Metal")
     stone = itemAccessor("stone", "Stone")
     temple = itemAccessor(`temple`, `Temple Progress`)
-    diplomaticFavor = itemAccessor(`diplomatic`, `Diplomatic Favor`)
+    diplomaticFavor = itemAccessor(`diplomaticFavor`, `Diplomatic Favor`)
 
     constructor() {
         this.population().addCapacity(this.housing(), 5)

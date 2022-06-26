@@ -131,7 +131,6 @@ export class Conversion {
     }
 
     increaseCurrent(amount = 1) {
-        amount = Math.min(this.amount - this.current, amount)
         this.current += amount
         this.onAmountChange.trigger(this)
         this.inputs.forEach((inp) => {
@@ -145,7 +144,6 @@ export class Conversion {
     }
 
     decreaseCurrent(amount = 1) {
-        amount = Math.min(this.current, amount)
         this.current -= amount
         this.onAmountChange.trigger(this)
         this.inputs.forEach((inp) => {

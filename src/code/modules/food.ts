@@ -27,7 +27,7 @@ export const foraging = (items: Items) => {
             module(`farming`)
                 .name("Plant Seeds")
                 .description(`Plant some seeds from the most delicious crops in the muddy earth.`)
-                .unlockConditions([unlock(items.housing(), "more", 1)])
+                .unlockConditions([unlock(items.housing(), "atleast", 1)])
                 .button("trigger", `Plant seeds`,
                     conversion(`farmingPlantSeed`)
                         .inputs([items.food(1)])
@@ -44,7 +44,7 @@ export const foraging = (items: Items) => {
                             conversion(`farmingHarvesting`)
                                 .amount(1)
                                 .inputs([items.labor(4, [modi(`irrigation`, 0.1)]), items.metal(0, [modi(`metalTools`, 0.05)])])
-                                .outputs([items.food(4.5, [modi(`irrigation`, 0.20), modi(`metalTools`, 0.5)])])
+                                .outputs([items.food(4.5, [modi(`irrigation`, 0.20), modi(`metalTools`, 1.5)])])
                                 .complete()
                         ])
                         .button("build", "Sow more land",

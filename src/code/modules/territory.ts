@@ -50,11 +50,12 @@ export const territory = (items: Items) => {
                 .name("Set Up Camp")
                 .description(`Set up temporary camps to return to.
                 <br> (Each piece of land you have visited can support 1 more camp.)`)
-                .unlockConditions([unlock(items.land(), "more", 5)])
+                .unlockConditions([unlock(items.land(), "atleast", 5)])
                 .button("build", "Set up another camp",
                     conversion(`setUpAnotherCamp`)
-                        .inputs([items.land(1)])
+                        .inputs([items.land(1), items.wood(5)])
                         .outputs([items.housing(1)])
+                        .modifier(`completions`, `campLevel`)
                         .complete())
                 .button("trigger", "The beginnings of a city..",
                     conversion(`startCity`)
@@ -80,8 +81,9 @@ export const territory = (items: Items) => {
             module(`populationGrowth`)
                 .name("Growing Population")
                 .description(`Your group is beginning to grow now.
-                 As your population grows you will will be able to have a larger workforce.`)
-                .unlockConditions([unlock(items.housing(), "more", 2)])
+                 As your population grows you will will be able to have a larger workforce.
+                 Build more housing to increase the rate you can use labor.`)
+                .unlockConditions([unlock(items.housing(), "atleast", 1)])
                 .conversions([
                     conversion(`popGrowthPops`)
                         .inputs([])
@@ -91,7 +93,7 @@ export const territory = (items: Items) => {
                         .complete(),
                     conversion(`popGrowthWorkForce`)
                         .inputs([items.food(1)])
-                        .outputs([items.labor(1, [modi(`cityLevel`)])])
+                        .outputs([items.labor(1, [modi(`cityLevel`), modi(`campLevel`, 0.2)])])
                         .amount(1)
                         .complete()
                 ])

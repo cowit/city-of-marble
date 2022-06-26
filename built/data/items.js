@@ -19,17 +19,26 @@ export class Item {
             next: 0
         };
         this.capacities = new Map();
-        this.unlocked = true;
+        this.unlocked = false;
         //Events
         this.onAmountChange = new EventHandler();
         this.onTotalChange = new EventHandler();
         this.onModifierChange = new EventHandler();
         this.onActivation = new EventHandler();
+        this.onUnlockToggle = new EventHandler();
         this.events = new Map()
             .set(`amountChange`, this.onAmountChange)
             .set(`totalChange`, this.onTotalChange)
             .set(`modifierChange`, this.onModifierChange)
             .set(`activation`, this.onActivation);
+    }
+    lock() {
+        this.unlocked = false;
+        this.onUnlockToggle.trigger(this.unlocked);
+    }
+    unlock() {
+        this.unlocked = true;
+        this.onUnlockToggle.trigger(this.unlocked);
     }
     activate() {
         this.amountChange.current = this.amountChange.next;
@@ -48,6 +57,7 @@ export class Item {
         return this._amount;
     }
     amount(newAmount) {
+        this.unlock();
         //If the capacity is set to 0, uncap it. Otherwise cap it.
         if (this.capacities.size !== 0)
             newAmount = Math.min(this.capacity, newAmount);
@@ -155,7 +165,7 @@ export class Items {
         this.metal = itemAccessor("metal", "Metal");
         this.stone = itemAccessor("stone", "Stone");
         this.temple = itemAccessor(`temple`, `Temple Progress`);
-        this.diplomaticFavor = itemAccessor(`diplomatic`, `Diplomatic Favor`);
+        this.diplomaticFavor = itemAccessor(`diplomaticFavor`, `Diplomatic Favor`);
         this.population().addCapacity(this.housing(), 5);
         this.labor().addCapacity(this.population(), 5);
     }

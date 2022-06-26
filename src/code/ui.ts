@@ -33,6 +33,16 @@ export function itemIcon(item: Item | ItemRef, parent: UIComponent | JQuery, con
         })
     }
 
+    //When the item unlock is toggled, hide/show it
+    item.onUnlockToggle.listen((state) => {
+        if (state) {
+            comp.show()
+        }
+        else {
+            comp.hide()
+        }
+    })
+
 
     //Subscribe to the change amount event to keep the icon updated.
     item.on("amountChange", (e) => {
@@ -160,14 +170,15 @@ export class UIComponent {
         //Add an item icon to the UIC for each input. If there are no inputs, hide the box and arrow.
         if (con.inputs.length > 0) {
             con.inputs.forEach(inp => {
-                const iconText = itemIcon(inp, this, con)
+                const iconWrapper = itemIcon(inp, this, con)
                     .appendTo(comp.find(".conversion-items[inputs]"))
                     .addClass("negative")
-                    .find('.conversion-amount')
-
                 inp.on("modifierChange", (e) => {
-                    iconText.text(e.newAmount)
+                    iconWrapper.find('.conversion-amount').text(e.newAmount)
                 })
+
+
+                if(inp.total() === 0) iconWrapper.hide()
             })
         }
         else {
@@ -185,14 +196,15 @@ export class UIComponent {
         //Same for outputs.
         if (con.outputs.length > 0) {
             con.outputs.forEach(out => {
-                const iconText = itemIcon(out, this, con)
+                const iconWrapper = itemIcon(out, this, con)
                     .appendTo(comp.find(".conversion-items[outputs]"))
                     .addClass("positive")
-                    .find('.conversion-amount')
+
 
                 out.on("modifierChange", (e) => {
-                    iconText.text(e.newAmount)
+                    iconWrapper.find('.conversion-amount').text(e.newAmount)
                 })
+                if(out.total() === 0) iconWrapper.hide()
             })
         }
         else {

@@ -49,6 +49,14 @@ export class UnlockCondition {
                 return this.target.total() > this.condition;
             }
         }
+        else if (this.operator === "atleast") {
+            if (this.target instanceof ModifiableVariable) {
+                return this.target.totalNumber >= this.condition;
+            }
+            else if (this.target instanceof Item) {
+                return this.target.total() >= this.condition;
+            }
+        }
         else
             throw new Error(`No Targets where compatible in this unlock condition.`);
     }

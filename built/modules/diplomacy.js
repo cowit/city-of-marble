@@ -1,5 +1,5 @@
 import { conversion } from "../conversions.js";
-import { module, ModuleExporter } from "../module.js";
+import { module, ModuleExporter, unlock } from "../module.js";
 export const diplomacy = (items) => {
     return new ModuleExporter("diplomacy", [
         module(`diplomats`)
@@ -13,6 +13,10 @@ export const diplomacy = (items) => {
                 .amount(1)
                 .complete()
         ])
+            .unlockConditions([
+            unlock(items.land(), `equals`, 0),
+            unlock(items.unexploredLand(), `equals`, 0)
+        ])
             .complete(),
         module(`diploLand`)
             .name(`Land Dispute`)
@@ -21,6 +25,10 @@ export const diplomacy = (items) => {
             .inputs([items.diplomaticFavor(25)])
             .outputs([items.land(1)])
             .complete())
+            .unlockConditions([
+            unlock(items.land(), `equals`, 0),
+            unlock(items.unexploredLand(), `equals`, 0)
+        ])
             .complete()
     ]);
 };

@@ -1,6 +1,6 @@
 import { conversion } from "../conversions.js";
 import { modi } from "../modifiers.js";
-import { module, ModuleExporter } from "../module.js";
+import { module, ModuleExporter, unlock } from "../module.js";
 export const stone = (items) => {
     return new ModuleExporter("stone", [
         module(`quarry`)
@@ -15,6 +15,7 @@ export const stone = (items) => {
                 .amount(1)
                 .complete()
         ])
+            .unlockConditions([unlock(items.population(), "more", 20)])
             .complete(),
         module(`quarryTransport`)
             .name(`Transportation`)
@@ -25,6 +26,7 @@ export const stone = (items) => {
             .inputs([items.labor(25, [modi(`quarryRoads`, 10)]), items.wood(15)])
             .modifier(1, `quarryRoads`)
             .complete())
+            .unlockConditions([unlock(items.population(), "more", 20)])
             .complete(),
         module(`newQuarry`)
             .name(`Create new Quarry`)
@@ -36,6 +38,7 @@ export const stone = (items) => {
             .modifier('clear', `quarryRoads`)
             .modifier('clear', `quarryRoads`)
             .complete())
+            .unlockConditions([unlock(items.population(), "more", 20)])
             .complete()
     ]);
 };

@@ -15,9 +15,9 @@ earth.addModuleLine(metal);
 earth.addModuleLine(stone);
 earth.addModuleLine(temple);
 earth.items.unexploredLand().amount(10);
+//earth.items.housing().amount(1)
 //earth.items.land().amount(100)
-earth.items.housing().amount(10);
-earth.items.population().amount(50);
+//earth.items.population().amount(50)
 //earth.items.labor().amount(250)
 //earth.items.wood().amount(100)
 const tooltipEle = $(`#tooltip`);

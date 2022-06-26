@@ -29,6 +29,7 @@ export const temple = (items: Items) => {
                                 .complete()
                         ])
                 )
+                .unlockConditions([unlock(items.population(), "more", 30)])
                 .complete()
         ]
     )

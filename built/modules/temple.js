@@ -1,5 +1,5 @@
 import { conversion } from "../conversions.js";
-import { module, ModuleExporter } from "../module.js";
+import { module, ModuleExporter, unlock } from "../module.js";
 export const temple = (items) => {
     return new ModuleExporter("temple", [
         module(`temple`)
@@ -19,6 +19,7 @@ export const temple = (items) => {
                 .outputs([items.temple(1)])
                 .complete()
         ]))
+            .unlockConditions([unlock(items.population(), "more", 30)])
             .complete()
     ]);
 };

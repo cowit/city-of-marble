@@ -19,6 +19,7 @@ export const stone = (items: Items) => {
                         .amount(1)
                         .complete()
                 ])
+                .unlockConditions([unlock(items.population(), "more", 20)])
                 .complete(),
             module(`quarryTransport`)
                 .name(`Transportation`)
@@ -31,6 +32,7 @@ export const stone = (items: Items) => {
                         .modifier(1, `quarryRoads`)
                         .complete()
                 )
+                .unlockConditions([unlock(items.population(), "more", 20)])
                 .complete(),
             module(`newQuarry`)
                 .name(`Create new Quarry`)
@@ -44,6 +46,7 @@ export const stone = (items: Items) => {
                         .modifier('clear', `quarryRoads`)
                         .complete()
                 )
+                .unlockConditions([unlock(items.population(), "more", 20)])
                 .complete()
         ]
     )

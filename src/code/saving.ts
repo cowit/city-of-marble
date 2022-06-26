@@ -55,9 +55,11 @@ export function loadSaveFile(file: any, handler: ModuleHandler) {
     const jsonSave = JSON.parse(file) as SaveObject
     //Load Items
     jsonSave.items.forEach((ite) => {
+        if (handler.items[ite.id as keyof Items] === undefined) console.error(`Item ${ite.id} does not exist`)
         const item = handler.items[ite.id as keyof Items]()
         item.amount(ite.amount)
-        item.unlocked = ite.unlocked
+        if (ite.unlocked) item.unlock()
+        else item.lock()
     })
 
     //Load Modules 

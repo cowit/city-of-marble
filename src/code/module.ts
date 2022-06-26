@@ -5,14 +5,14 @@ import { Item, ItemRef, Items } from "./data/items.js";
 import { ModuleHandler } from "./module-handler.js";
 import { UIComponent } from "./ui.js";
 
-export function unlock(target: ModifierReference | Item, operator: `more` | `less` | `equals`, condition: number | string) {
+export function unlock(target: ModifierReference | Item, operator: `more` | `less` | `equals` | `atleast`, condition: number | string) {
     return new UnlockCondition(target, operator, condition)
 }
 
 export class UnlockCondition {
     constructor(
         public target: ModifierReference | Item | ModifiableVariable<string | number>,
-        public operator: `more` | `less` | `equals`,
+        public operator: `more` | `less` | `equals` | `atleast`,
         public condition: number | string
     ) {
 
@@ -32,7 +32,6 @@ export class UnlockCondition {
         }
         else if (this.operator === "less") {
             if (this.target instanceof ModifiableVariable) {
-
                 return this.target.totalNumber < this.condition
             }
             else if (this.target instanceof Item) {
@@ -41,12 +40,18 @@ export class UnlockCondition {
         }
         else if (this.operator === "more") {
             if (this.target instanceof ModifiableVariable) {
-
                 return this.target.totalNumber > this.condition
             }
             else if (this.target instanceof Item) {
-
                 return this.target.total() > this.condition
+            }
+        }
+        else if (this.operator === "atleast") {
+            if (this.target instanceof ModifiableVariable) {
+                return this.target.totalNumber >= this.condition
+            }
+            else if (this.target instanceof Item) {
+                return this.target.total() >= this.condition
             }
         }
         else throw new Error(`No Targets where compatible in this unlock condition.`)

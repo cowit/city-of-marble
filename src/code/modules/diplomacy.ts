@@ -18,6 +18,10 @@ export const diplomacy = (items: Items) => {
                         .amount(1)
                         .complete()
                 ])
+                .unlockConditions([
+                    unlock(items.land(), `equals`, 0),
+                    unlock(items.unexploredLand(), `equals`, 0)
+                ])
                 .complete(),
             module(`diploLand`)
                 .name(`Land Dispute`)
@@ -28,6 +32,10 @@ export const diplomacy = (items: Items) => {
                         .outputs([items.land(1)])
                         .complete()
                 )
+                .unlockConditions([
+                    unlock(items.land(), `equals`, 0),
+                    unlock(items.unexploredLand(), `equals`, 0)
+                ])
                 .complete()
         ]
     )

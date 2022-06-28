@@ -104,14 +104,26 @@ export class UIComponent {
     appendTo(newParent) {
         return this.element.appendTo(newParent);
     }
-    moduleLine() {
+    moduleLine(modLine, handler) {
         const comp = $(/*html*/ `
             <div class="module-container">
             </div>
         `);
+        const tab = $(/*html*/ `
+            <div class="tab button">
+                ${modLine.id}
+            </div>
+        `);
+        $(`#tabs-row`).append(tab);
         const uic = new ModuleLine(comp);
         uic.parent = this;
         this.element.append(comp);
+        tab.on(`click`, () => {
+            handler.lines.forEach(lin => {
+                lin.hide();
+            });
+            uic.show();
+        });
         return uic;
     }
     conversionBox(con, isButton = false) {
@@ -136,10 +148,8 @@ export class UIComponent {
             `);
         }
         const amountButtons = comp.find(`.amount-controls`);
-        if (con.amount < 1) {
+        if (con.amount < 1)
             amountButtons.hide();
-        }
-
         const currentEle = comp.find(`.current`);
         const amountEle = comp.find(`.maximum`);
         comp.find(`[plus]`).on("click", () => {
@@ -264,11 +274,6 @@ export class ModuleLine extends UIComponent {
         uic.parent = this;
         this.element.append(comp);
         const unlockMarker = comp.find(".unlock-marker").hide();
-        if (this.children.length > 0) {
-            const modLine = $(/*html*/ ` <p class="module-connector fade">|</p>`);
-            uic.secondaryComponents.push(modLine);
-            comp.before(modLine);
-        }
         mod.conversions.forEach(con => {
             uic.conversionBox(con);
         });

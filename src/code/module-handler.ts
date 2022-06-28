@@ -23,12 +23,11 @@ export class ModuleHandler {
     }
 
     addModuleLine(createModEx: ((item: Items) => ModuleExporter)) {
-
         const modEx = createModEx(this.items)
 
         let line = this.lines.get(modEx.id)
         if (!line) {
-            line = this.moduleContainer.moduleLine()
+            line = this.moduleContainer.moduleLine(modEx, this)
             this.lines.set(modEx.id, line)
         }
         modEx.modArray.forEach((mod) => {
@@ -39,5 +38,7 @@ export class ModuleHandler {
             }
             else this.modules.set(module.id, module)
         })
+
+
     }
 }

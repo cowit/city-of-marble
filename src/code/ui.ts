@@ -1,6 +1,7 @@
 import { Conversion } from "./conversions.js"
 import { Item, ItemRef } from "./data/items.js"
-import { Module, ModuleButton } from "./module.js"
+import { ModuleHandler } from "./module-handler.js"
+import { Module, ModuleButton, ModuleExporter } from "./module.js"
 
 export function itemIcon(item: Item | ItemRef, parent: UIComponent | JQuery, conversion?: Conversion) {
     const comp = $(/*html*/`
@@ -110,14 +111,30 @@ export class UIComponent {
         return this.element.appendTo(newParent)
     }
 
-    moduleLine() {
+    moduleLine(modLine: ModuleExporter, handler: ModuleHandler) {
         const comp = $(/*html*/`
             <div class="module-container">
             </div>
         `)
+
+        const tab = $(/*html*/`
+            <div class="tab button">
+                ${modLine.id}
+            </div>
+        `)
+
+        $(`#tabs-row`).append(tab)
         const uic = new ModuleLine(comp)
         uic.parent = this
         this.element.append(comp)
+
+        tab.on(`click`, () => {
+            handler.lines.forEach(lin => {
+                lin.hide()
+            })
+
+            uic.show()
+        })
         return uic
     }
 
@@ -178,7 +195,7 @@ export class UIComponent {
                 })
 
 
-                if(inp.total() === 0) iconWrapper.hide()
+                if (inp.total() === 0) iconWrapper.hide()
             })
         }
         else {
@@ -204,7 +221,7 @@ export class UIComponent {
                 out.on("modifierChange", (e) => {
                     iconWrapper.find('.conversion-amount').text(e.newAmount)
                 })
-                if(out.total() === 0) iconWrapper.hide()
+                if (out.total() === 0) iconWrapper.hide()
             })
         }
         else {
@@ -262,7 +279,9 @@ export class UIComponent {
 
 export class ModuleLine extends UIComponent {
     children: UIComponent[] = []
-    constructor(public element: JQuery) { super(element) }
+    constructor(public element: JQuery) {
+        super(element)
+    }
 
     module(mod: Module) {
         const comp = $(/*html*/`
@@ -285,11 +304,7 @@ export class ModuleLine extends UIComponent {
         this.element.append(comp)
 
         const unlockMarker = comp.find(".unlock-marker").hide()
-        if (this.children.length > 0) {
-            const modLine = $(/*html*/` <p class="module-connector fade">|</p>`)
-            uic.secondaryComponents.push(modLine)
-            comp.before(modLine)
-        }
+
         mod.conversions.forEach(con => {
             uic.conversionBox(con)
         })

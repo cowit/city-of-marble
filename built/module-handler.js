@@ -21,7 +21,7 @@ export class ModuleHandler {
         const modEx = createModEx(this.items);
         let line = this.lines.get(modEx.id);
         if (!line) {
-            line = this.moduleContainer.moduleLine();
+            line = this.moduleContainer.moduleLine(modEx, this);
             this.lines.set(modEx.id, line);
         }
         modEx.modArray.forEach((mod) => {

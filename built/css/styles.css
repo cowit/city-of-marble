@@ -152,3 +152,25 @@ body {
 }
 
 /*#endregion*/
+
+/*#region Inner Wrapper*/
+
+#inner-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+}
+
+#tabs-row {
+    width: 100%;
+    height: fit-content;
+    margin-bottom: 10px;
+    display: flex;
+}
+
+.tab {
+    width: fit-content;
+    margin: 0 10px 0 0;
+}
+
+/*#endregion*/

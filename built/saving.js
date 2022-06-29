@@ -78,6 +78,13 @@ export function loadSaveFile(file, handler) {
             conversion.current = con.current;
             conversion.amount = con.amount;
             conversion.completions = con.completions;
+            conversion.inputs.forEach((inp) => {
+                inp.trigger(`amountChange`);
+            });
+            conversion.outputs.forEach((out) => {
+                out.trigger(`amountChange`);
+            });
+            conversion.onAmountChange.trigger(conversion);
         }
         else
             console.warn(`Unable to find conversion ${con.id}`);

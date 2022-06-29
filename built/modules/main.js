@@ -1,5 +1,4 @@
 import { conversion } from "../conversions.js";
-import { modi } from "../modifiers.js";
 import { module, ModuleExporter, unlock } from "../module.js";
 export const main = (items) => {
     return new ModuleExporter("main", [
@@ -25,10 +24,6 @@ export const main = (items) => {
                 .amount(1)
                 .complete()
         ])
-            .transform(`foodLine`, module(`foodLine`)
-            .name("Food Production")
-            .description(`Manage your production of food.`)
-            .unlockConditions([unlock(modi(`farmsBuilt`), "more", 5)]))
             .complete(),
     ]);
 };

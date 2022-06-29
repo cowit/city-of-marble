@@ -109,26 +109,30 @@ export class Conversion {
         this.onAmountChange.trigger(this);
     }
     increaseCurrent(amount = 1) {
-        this.current += amount;
-        this.onAmountChange.trigger(this);
-        this.inputs.forEach((inp) => {
-            inp.trigger(`amountChange`);
-        });
-        this.outputs.forEach((out) => {
-            out.trigger(`amountChange`);
-        });
-        this.setModifiers();
+        if (this.current < this.amount) {
+            this.current += amount;
+            this.onAmountChange.trigger(this);
+            this.inputs.forEach((inp) => {
+                inp.trigger(`amountChange`);
+            });
+            this.outputs.forEach((out) => {
+                out.trigger(`amountChange`);
+            });
+            this.setModifiers();
+        }
     }
     decreaseCurrent(amount = 1) {
-        this.current -= amount;
-        this.onAmountChange.trigger(this);
-        this.inputs.forEach((inp) => {
-            inp.trigger(`amountChange`);
-        });
-        this.outputs.forEach((out) => {
-            out.trigger(`amountChange`);
-        });
-        this.setModifiers();
+        if (this.current > 0) {
+            this.current -= amount;
+            this.onAmountChange.trigger(this);
+            this.inputs.forEach((inp) => {
+                inp.trigger(`amountChange`);
+            });
+            this.outputs.forEach((out) => {
+                out.trigger(`amountChange`);
+            });
+            this.setModifiers();
+        }
     }
     setModifiers() {
         if (this.modifierSelectors.length > 0) {

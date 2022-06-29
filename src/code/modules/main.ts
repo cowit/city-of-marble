@@ -30,12 +30,6 @@ export const main = (items: Items) => {
                         .amount(1)
                         .complete()
                 ])
-                .transform(`foodLine`,
-                    module(`foodLine`)
-                        .name("Food Production")
-                        .description(`Manage your production of food.`)
-                        .unlockConditions([unlock(modi(`farmsBuilt`), "more", 5)])
-                )
                 .complete(),
         ]
     )

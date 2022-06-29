@@ -1,4 +1,5 @@
 import { conversion } from "../conversions.js";
+import { modi } from "../modifiers.js";
 import { module, ModuleExporter, unlock } from "../module.js";
 export const diplomacy = (items) => {
     return new ModuleExporter("diplomacy", [
@@ -20,10 +21,12 @@ export const diplomacy = (items) => {
             .complete(),
         module(`diploLand`)
             .name(`Land Dispute`)
-            .description(`Resolve a land dispute in your favor, increasing the land under your control.`)
+            .description(`Resolve a land dispute in your favor, increasing the land under your control.
+                The more land you acquire this way, the harder it will be to get more using diplomacy.`)
             .button(`trigger`, `Settle Dispute`, conversion(`landDispute`)
-            .inputs([items.diplomaticFavor(25)])
+            .inputs([items.diplomaticFavor(5, [modi(`disputes`)])])
             .outputs([items.land(1)])
+            .modifier(`completions`, `disputes`)
             .complete())
             .unlockConditions([
             unlock(items.land(), `equals`, 0),

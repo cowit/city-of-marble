@@ -31,7 +31,7 @@ export const food = (items) => {
             .name("Basic Irrigation")
             .description(`Your people have started to notice that the best growing crops are grouped around the ponds and streams.
             Some have made small trenches for the water to flow deeper in towards the crops.`)
-            .unlockConditions([unlock(modi(`farmsBuilt`), "more", 5)])
+            .unlockConditions([unlock(modi(`farmsBuilt`), "atleast", 5)])
             .button("build", "Invest in digging more trenches", conversion(`irrigationDigMore`)
             .inputs([items.localWater(1, [modi(`irrigation`, 0.5)]), items.labor(5, [modi(`irrigation`, 5)])])
             .modifier(`completions`, `irrigation`)

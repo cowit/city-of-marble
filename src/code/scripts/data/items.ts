@@ -144,7 +144,7 @@ class Capacity {
 
 function itemAccessor(id: string, name: string) {
     //Create the Item
-    const item = new Item(id, name, "./items/item-icons/" + id + ".svg")
+    const item = new Item(id, name, "./built/items/item-icons/" + id + ".svg")
 
     //Create all the item-display divs on the storage bar.
     if ($(`#${id}-display`).length === 0) {

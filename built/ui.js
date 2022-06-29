@@ -64,10 +64,8 @@ export function itemIcon(item, parent, conversion) {
     if (!conversion) {
         item.on(`activation`, (e) => {
             var toShow = item.amountChange.current;
-            if (e.newAmount % 1 !== 0 && e.newAmount !== 0 && e.newAmount < 100)
-                toShow = toShow.toFixed(2);
-            else if (e.newAmount > 100)
-                toShow = Math.floor(toShow).toString();
+            /*if (e.newAmount % 1 !== 0 && e.newAmount !== 0 && e.newAmount < 100)*/ toShow = toShow.toFixed(2);
+            //else if (e.newAmount > 100) toShow = Math.floor(toShow).toString()
             //Display the current changes
             if (item.amountChange.current > 0) {
                 currentEle.text("+" + toShow);
@@ -110,7 +108,7 @@ export class UIComponent {
             </div>
         `);
         const tab = $(/*html*/ `
-            <div class="tab button">
+            <div class="tab button" id="${modLine.id}">
                 ${modLine.id}
             </div>
         `);
@@ -118,11 +116,17 @@ export class UIComponent {
         const uic = new ModuleLine(comp);
         uic.parent = this;
         this.element.append(comp);
+        const exclamationMark = $(/*html*/ `
+        <i class="fa-solid fa-circle-exclamation unlock-marker"></i>
+        `);
+        tab.append(exclamationMark);
+        tab.hide();
         tab.on(`click`, () => {
             handler.lines.forEach(lin => {
                 lin.hide();
             });
             uic.show();
+            $(exclamationMark).hide();
         });
         return uic;
     }

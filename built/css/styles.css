@@ -6,7 +6,7 @@
     font-weight: 500;
 
     --bright-filter: #a2a2a219;
-    --light-filter: #00000064;
+    --light-filter: #00000043;
     --dark-filter: #0000007d;
     --border-filter: #000000aa;
 }
@@ -163,6 +163,7 @@ body {
 
 #tabs-row {
     width: 100%;
+    min-height: 36px;
     height: fit-content;
     margin-bottom: 10px;
     display: flex;

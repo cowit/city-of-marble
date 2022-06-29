@@ -1,6 +1,7 @@
 import { Game } from "./game.js";
 import { diplomacy } from "./modules/diplomacy.js";
-import { foraging } from "./modules/food.js";
+import { food } from "./modules/food.js";
+import { main } from "./modules/main.js";
 import { metal } from "./modules/metal.js";
 import { stone } from "./modules/stone.js";
 import { temple } from "./modules/temple.js";
@@ -15,8 +16,9 @@ declare global {
     var game: Game
 }
 const earth = game.createPlanet("Earth")
+earth.addModuleLine(main)
 earth.addModuleLine(territory)
-earth.addModuleLine(foraging)
+earth.addModuleLine(food)
 earth.addModuleLine(diplomacy)
 earth.addModuleLine(metal)
 earth.addModuleLine(stone)
@@ -29,6 +31,11 @@ earth.items.unexploredLand().amount(10)
 //earth.items.wood().amount(100)
 
 
+//Hide all non-unlocked lines
+earth.lines.forEach(lin => {
+    lin.hide()
+})
+earth.lines.get(`main`)?.show()
 
 const tooltipEle = $(`#tooltip`)
 const tooltipName = $(`.tooltip-name`)
@@ -45,5 +52,6 @@ globalThis.tooltip = {
 
 
 setInterval(game.activate.bind(game), 1000)
+//setInterval(() => { saveModuleHandler(earth) }, 10000)
 $(`#save-button`).on("click", () => { saveModuleHandler(earth) })
 $(`#load-button`).on("click", () => { loadSaveFile(window.localStorage.getItem(`saveFile`), earth) })

@@ -107,8 +107,8 @@ export class ItemRef extends Item {
                 else {
                     this.totalVar = game.currentPlanet().globalModifiers.subscribe(mod, this._amount)
                 }
-
             })
+
             this.totalVar?.onModifierChange.listen(() => {
                 //Called when a modifier is changed
                 this.onModifierChange.trigger(new ItemEvent(this.total(), this))

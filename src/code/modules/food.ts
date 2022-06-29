@@ -3,27 +3,11 @@ import { conversion } from "../conversions.js";
 import { Items } from "../data/items.js";
 import { module, ModuleExporter, unlock } from "../module.js";
 
-export const foraging = (items: Items) => {
+export const food = (items: Items) => {
     return new ModuleExporter(
-        "foraging",
+        "food",
         [
-            module(`foraging`)
-                .name("Foraging")
-                .description(`Your people will help you forage, feeding themselves and helping others.`)
-                .conversions([
-                    conversion(`foragingForage`)
-                        .inputs([])
-                        .outputs([items.food(1)])
-                        .amount(1)
-                        .complete()
-                ])
-                .transform(`foodLine`,
-                    module(`foodLine`)
-                        .name("Food Production")
-                        .description(`Manage your production of food.`)
-                        .unlockConditions([unlock(modi(`farmsBuilt`), "more", 5)])
-                )
-                .complete(),
+
             module(`farming`)
                 .name("Plant Seeds")
                 .description(`Plant some seeds from the most delicious crops in the muddy earth.`)

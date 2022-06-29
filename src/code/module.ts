@@ -104,7 +104,7 @@ export class ModuleArguments {
     }
 
     complete() {
-        const mod = (items: Items) => {
+        const mod = (items: Items, lineID: string) => {
             if (!this._id) throw new Error(`A Module Does not have an ID assigned to it.`)
             if (!this._name) throw new Error(`Module ${this._id} does not have a Name assigned to it.`)
             const module = new Module(items,
@@ -113,7 +113,10 @@ export class ModuleArguments {
                 this._description,
                 this._conversions, this._transforms,
                 this._buttons,
-                this._unlockConditions)
+                this._unlockConditions,
+                true,
+                lineID
+            )
             //Inject the module into all items/itemrefs so that they can use it's modifiers.
             module.conversions.forEach(con => {
                 con.inputs.forEach(inp => { inp.module = module })
@@ -152,6 +155,8 @@ export class Module {
     transformID?: string
     //History of transforms used for saving
     transformHistory: string[] = []
+
+
     constructor(
         public items: Items,
         public id: string,
@@ -161,7 +166,8 @@ export class Module {
         public transforms: Map<string, ModuleArguments>, //A map of module arguments which can be completed and overwrite this module.
         public buttons: ModuleButton[] = [],
         public unlockConditions: UnlockCondition[] = [],
-        public unlocked: boolean = true
+        public unlocked: boolean = true,
+        public lineID: string //ID of the line this is a child of
     ) {
         if (unlockConditions.length > 0) this.unlocked = false
     }
@@ -210,12 +216,21 @@ export class Module {
     unlock() {
         this.unlocked = true
         this.uiComponent?.show()
+        $(`#${this.lineID}`)
+            .show()
+            .find(`.unlock-marker`)
+            .show()
+    }
+
+    lock() {
+        this.unlocked = false
+        this.uiComponent?.hide()
     }
 
     //Transform this module using a set of module arguments.
     transform(transformID: string) {
         //Attempt to get the transform from the transforms map.
-        const transform = this.transforms.get(transformID)?.complete()(this.items)
+        const transform = this.transforms.get(transformID)?.complete()(this.items, this.lineID)
 
         //Check that it pulls one that exists.
         if (transform) {
@@ -231,6 +246,6 @@ export class Module {
 }
 
 export class ModuleExporter {
-    constructor(public id: string, public modArray: ((items: Items) => Module)[]) { }
+    constructor(public id: string, public modArray: ((items: Items, lineID: string) => Module)[]) { }
 }
 

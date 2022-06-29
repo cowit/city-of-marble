@@ -3,36 +3,6 @@ import { modi } from "../modifiers.js";
 import { module, ModuleExporter, unlock } from "../module.js";
 export const territory = (items) => {
     return new ModuleExporter("territory", [
-        module(`explore`)
-            .name("Exploring")
-            .description(`You are a small group of hunter-gatherers trying to survive and grow.
-                <br>(Click the button below to forage for some food and explore the land.)`)
-            .conversions([])
-            .button("trigger", "Explore for more land to forage", conversion(`exploreButton`)
-            .inputs([items.unexploredLand(1)])
-            .outputs([items.land(1), items.localWater(1), items.wood(1)])
-            .modifier(1, `exploredLand`)
-            .complete())
-            .transform(`outskirts`, module(`outskirts`)
-            .name(`Outskirts`)
-            .description(`Outside of the boundary of the city, mostly unprotected and uncontrolled.
-                Your people travel out there to collect the things they need, it could be beneficial to have patrols protecting them.`)
-            .conversions([
-            conversion(`outskirtsWood`)
-                .amount(1)
-                .inputs([items.labor(5), items.metal(0, [modi(`metalTools`, 0.05)])])
-                .outputs([items.wood(1, [modi(`outskirtPatrols`, 0.5), modi(`metalTools`, 0.5)])])
-                .complete()
-        ])
-            .button(`build`, `Increase lumber outposts`, conversion(`buildLumberOutpost`)
-            .inputs([items.labor(20)])
-            .complete())
-            .button("trigger", `Arm more patrols`, conversion(`outskirtPatrolsButton`)
-            .inputs([items.labor(10), items.metal(10)])
-            .modifier(`completions`, `outskirtPatrols`)
-            .complete())
-            .unlockConditions([unlock(items.unexploredLand(), "equals", 0)]))
-            .complete(),
         module(`shelter`)
             .name("Set Up Camp")
             .description(`Set up temporary camps to return to.
@@ -57,6 +27,27 @@ export const territory = (items) => {
             .modifier(`completions`, `cityLevel`)
             .complete()))
             .complete(),
+        module(`outskirts`)
+            .name(`Outskirts`)
+            .description(`Outside of the boundary of the settlement, mostly unprotected and uncontrolled.
+    Your people travel out there to collect the things they need, it could be beneficial to have patrols protecting them.
+    (Use the -/+ buttons to assign more or less labor.)`)
+            .conversions([
+            conversion(`outskirtsWood`)
+                .amount(1)
+                .inputs([items.labor(5), items.metal(0, [modi(`metalTools`, 0.05)])])
+                .outputs([items.wood(1, [modi(`outskirtPatrols`, 0.5), modi(`metalTools`, 0.5)])])
+                .complete()
+        ])
+            .button(`build`, `Increase lumber outposts`, conversion(`buildLumberOutpost`)
+            .inputs([items.labor(20)])
+            .complete())
+            .button("trigger", `Arm more patrols`, conversion(`outskirtPatrolsButton`)
+            .inputs([items.labor(10), items.metal(10)])
+            .modifier(`completions`, `outskirtPatrols`)
+            .complete())
+            .unlockConditions([unlock(items.unexploredLand(), "equals", 0)])
+            .complete(),
         module(`populationGrowth`)
             .name("Growing Population")
             .description(`Your group is beginning to grow now.
@@ -71,8 +62,8 @@ export const territory = (items) => {
                 .hideButtons()
                 .complete(),
             conversion(`popGrowthWorkForce`)
-                .inputs([items.food(1)])
-                .outputs([items.labor(1, [modi(`cityLevel`), modi(`campLevel`, 0.2)])])
+                .inputs([items.food(4, [modi(`cityLevel`), modi(`campLevel`, 0.5)])])
+                .outputs([items.labor(4, [modi(`cityLevel`), modi(`campLevel`, 0.5)])])
                 .amount(1)
                 .complete()
         ])

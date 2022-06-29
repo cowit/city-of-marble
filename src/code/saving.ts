@@ -73,7 +73,7 @@ export function loadSaveFile(file: any, handler: ModuleHandler) {
             if (mod.unlocked) {
                 module.unlock()
             }
-            else module.unlocked = false
+            else module.lock()
         }
         else console.warn(`Unable to find module ${mod.id}`)
     })

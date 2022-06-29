@@ -31,7 +31,7 @@ export class ModuleHandler {
             this.lines.set(modEx.id, line)
         }
         modEx.modArray.forEach((mod) => {
-            const module = mod(this.items)
+            const module = mod(this.items, modEx.id)
             line?.module(module)
             if (this.modules.has(module.id)) {
                 throw new Error(`Module with ID ${module.id} already exists, please fix conflict.`)

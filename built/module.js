@@ -100,12 +100,12 @@ export class ModuleArguments {
         return this;
     }
     complete() {
-        const mod = (items) => {
+        const mod = (items, lineID) => {
             if (!this._id)
                 throw new Error(`A Module Does not have an ID assigned to it.`);
             if (!this._name)
                 throw new Error(`Module ${this._id} does not have a Name assigned to it.`);
-            const module = new Module(items, this._id, this._name, this._description, this._conversions, this._transforms, this._buttons, this._unlockConditions);
+            const module = new Module(items, this._id, this._name, this._description, this._conversions, this._transforms, this._buttons, this._unlockConditions, true, lineID);
             //Inject the module into all items/itemrefs so that they can use it's modifiers.
             module.conversions.forEach(con => {
                 con.inputs.forEach(inp => { inp.module = module; });
@@ -130,7 +130,8 @@ export function module(id) {
 //The module is what the base interface which interacts with the planet.
 export class Module {
     constructor(items, id, name, description, conversions, transforms, //A map of module arguments which can be completed and overwrite this module.
-    buttons = [], unlockConditions = [], unlocked = true) {
+    buttons = [], unlockConditions = [], unlocked = true, lineID //ID of the line this is a child of
+    ) {
         this.items = items;
         this.id = id;
         this.name = name;
@@ -140,6 +141,7 @@ export class Module {
         this.buttons = buttons;
         this.unlockConditions = unlockConditions;
         this.unlocked = unlocked;
+        this.lineID = lineID;
         //Event handler which is triggered when the transform method is complete.
         this.onTransform = new EventHandler();
         //Called when this is unlocked
@@ -193,12 +195,21 @@ export class Module {
         var _a;
         this.unlocked = true;
         (_a = this.uiComponent) === null || _a === void 0 ? void 0 : _a.show();
+        $(`#${this.lineID}`)
+            .show()
+            .find(`.unlock-marker`)
+            .show();
+    }
+    lock() {
+        var _a;
+        this.unlocked = false;
+        (_a = this.uiComponent) === null || _a === void 0 ? void 0 : _a.hide();
     }
     //Transform this module using a set of module arguments.
     transform(transformID) {
         var _a;
         //Attempt to get the transform from the transforms map.
-        const transform = (_a = this.transforms.get(transformID)) === null || _a === void 0 ? void 0 : _a.complete()(this.items);
+        const transform = (_a = this.transforms.get(transformID)) === null || _a === void 0 ? void 0 : _a.complete()(this.items, this.lineID);
         //Check that it pulls one that exists.
         if (transform) {
             this.transformID = transformID;

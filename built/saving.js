@@ -66,7 +66,7 @@ export function loadSaveFile(file, handler) {
                 module.unlock();
             }
             else
-                module.unlocked = false;
+                module.lock();
         }
         else
             console.warn(`Unable to find module ${mod.id}`);

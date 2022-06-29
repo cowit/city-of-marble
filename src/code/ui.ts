@@ -47,6 +47,7 @@ export function itemIcon(item: Item | ItemRef, parent: UIComponent | JQuery, con
 
     //Subscribe to the change amount event to keep the icon updated.
     item.on("amountChange", (e) => {
+
         if (!conversion) comp.show()
         if (conversion && conversion.current > 0) {
             e.newAmount *= conversion.current
@@ -71,9 +72,10 @@ export function itemIcon(item: Item | ItemRef, parent: UIComponent | JQuery, con
     //Subscribe and change UI when the item is activated
     if (!conversion) {
         item.on(`activation`, (e) => {
+
             var toShow: number | string = item.amountChange.current
-            if (e.newAmount % 1 !== 0 && e.newAmount !== 0 && e.newAmount < 100) toShow = toShow.toFixed(2)
-            else if (e.newAmount > 100) toShow = Math.floor(toShow).toString()
+            /*if (e.newAmount % 1 !== 0 && e.newAmount !== 0 && e.newAmount < 100)*/ toShow = toShow.toFixed(2)
+            //else if (e.newAmount > 100) toShow = Math.floor(toShow).toString()
             //Display the current changes
             if (item.amountChange.current > 0) {
                 currentEle.text("+" + toShow)
@@ -118,7 +120,7 @@ export class UIComponent {
         `)
 
         const tab = $(/*html*/`
-            <div class="tab button">
+            <div class="tab button" id="${modLine.id}">
                 ${modLine.id}
             </div>
         `)
@@ -128,12 +130,19 @@ export class UIComponent {
         uic.parent = this
         this.element.append(comp)
 
+        const exclamationMark = $(/*html*/`
+        <i class="fa-solid fa-circle-exclamation unlock-marker"></i>
+        `)
+        tab.append(exclamationMark)
+
+        tab.hide()
         tab.on(`click`, () => {
             handler.lines.forEach(lin => {
                 lin.hide()
             })
 
             uic.show()
+            $(exclamationMark).hide()
         })
         return uic
     }

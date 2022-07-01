@@ -16,7 +16,7 @@ export const metal = (items) => {
             .button(`build`, `Send More Gatherers`, conversion(`sendGatherers`)
             .inputs([items.labor(25)])
             .complete())
-            .unlockConditions([unlock(items.population(), `more`, 25)])
+            .unlockConditions([unlock(items.population(), `more`, 50)])
             .complete(),
         module(`smelting`)
             .name(`Campfire Forging`)
@@ -33,19 +33,20 @@ export const metal = (items) => {
             .button(`build`, `Set up fires`, conversion(`moreFires`)
             .inputs([items.wood(5), items.labor(10)])
             .complete())
-            .unlockConditions([unlock(items.population(), `more`, 25)])
+            .unlockConditions([unlock(items.population(), `more`, 50)])
             .complete(),
         module(`metalImprovements`)
             .name(`Improve Tools with Metal`)
             .description(`The jewelry made by your people have become more intricate with time.
-                As the smiths/jewelers continue to tinker with the metals, they have started to use the sharp edges that the metal can make for improving their hoes, knives and other tools.`)
+                As the smiths/jewelers continue to tinker with the metals, they have started to use the sharp edges that the metal can make for improving their hoes, knives and other tools.
+                (You can reduce the metal cost of workers by clicking the minus button.)`)
             .conversions([
             conversion(`metalImprovements`)
                 .amount(1)
                 .modifier(`current`, `metalTools`)
                 .complete()
         ])
-            .unlockConditions([unlock(items.population(), `more`, 25)])
+            .unlockConditions([unlock(items.population(), `more`, 50)])
             .complete()
     ]);
 };

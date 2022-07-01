@@ -68,6 +68,7 @@ export class ModuleArguments {
         this._description = "";
         this._transforms = new Map();
         this._unlockConditions = [];
+        this._lockIDs = [];
     }
     id(id) {
         this._id = id;
@@ -95,8 +96,10 @@ export class ModuleArguments {
         this._transforms.set(id, transform);
         return this;
     }
-    unlockConditions(conditions) {
+    unlockConditions(conditions, lockIDs) {
         this._unlockConditions = conditions;
+        if (lockIDs)
+            this._lockIDs = lockIDs;
         return this;
     }
     complete() {
@@ -105,7 +108,7 @@ export class ModuleArguments {
                 throw new Error(`A Module Does not have an ID assigned to it.`);
             if (!this._name)
                 throw new Error(`Module ${this._id} does not have a Name assigned to it.`);
-            const module = new Module(items, this._id, this._name, this._description, this._conversions, this._transforms, this._buttons, this._unlockConditions, true, lineID);
+            const module = new Module(items, this._id, this._name, this._description, this._conversions, this._transforms, this._buttons, this._unlockConditions, true, lineID, this._lockIDs);
             //Inject the module into all items/itemrefs so that they can use it's modifiers.
             module.conversions.forEach(con => {
                 con.inputs.forEach(inp => { inp.module = module; });
@@ -130,8 +133,8 @@ export function module(id) {
 //The module is what the base interface which interacts with the planet.
 export class Module {
     constructor(items, id, name, description, conversions, transforms, //A map of module arguments which can be completed and overwrite this module.
-    buttons = [], unlockConditions = [], unlocked = true, lineID //ID of the line this is a child of
-    ) {
+    buttons = [], unlockConditions = [], unlocked = true, lineID, //ID of the line this is a child of
+    lockIDs) {
         this.items = items;
         this.id = id;
         this.name = name;
@@ -142,6 +145,7 @@ export class Module {
         this.unlockConditions = unlockConditions;
         this.unlocked = unlocked;
         this.lineID = lineID;
+        this.lockIDs = lockIDs;
         //Event handler which is triggered when the transform method is complete.
         this.onTransform = new EventHandler();
         //Called when this is unlocked
@@ -199,6 +203,15 @@ export class Module {
             .show()
             .find(`.unlock-marker`)
             .show();
+        if (this.lockIDs) {
+            this.lockIDs.forEach(id => {
+                const module = game.currentPlanet().modules.get(id);
+                if (module)
+                    module.lock();
+                else
+                    console.warn(`Could not find module ${id} to lock after unlocked ${this.id}`);
+            });
+        }
     }
     lock() {
         var _a;

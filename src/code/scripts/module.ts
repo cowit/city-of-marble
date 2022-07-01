@@ -66,6 +66,7 @@ export class ModuleArguments {
     private _description: string = ""
     public _transforms = new Map<string, ModuleArguments>()
     public _unlockConditions: UnlockCondition[] = []
+    public _lockIDs: string[] = []
     id(id: string) {
         this._id = id
         return this
@@ -98,8 +99,9 @@ export class ModuleArguments {
         return this
     }
 
-    unlockConditions(conditions: UnlockCondition[]) {
+    unlockConditions(conditions: UnlockCondition[], lockIDs?: string[]) {
         this._unlockConditions = conditions
+        if (lockIDs) this._lockIDs = lockIDs
         return this
     }
 
@@ -115,7 +117,8 @@ export class ModuleArguments {
                 this._buttons,
                 this._unlockConditions,
                 true,
-                lineID
+                lineID,
+                this._lockIDs
             )
             //Inject the module into all items/itemrefs so that they can use it's modifiers.
             module.conversions.forEach(con => {
@@ -167,7 +170,8 @@ export class Module {
         public buttons: ModuleButton[] = [],
         public unlockConditions: UnlockCondition[] = [],
         public unlocked: boolean = true,
-        public lineID: string //ID of the line this is a child of
+        public lineID: string, //ID of the line this is a child of
+        public lockIDs?: string[]
     ) {
         if (unlockConditions.length > 0) this.unlocked = false
     }
@@ -220,6 +224,14 @@ export class Module {
             .show()
             .find(`.unlock-marker`)
             .show()
+
+        if (this.lockIDs) {
+            this.lockIDs.forEach(id => {
+                const module = game.currentPlanet().modules.get(id)
+                if (module) module.lock()
+                else console.warn(`Could not find module ${id} to lock after unlocked ${this.id}`)
+            })
+        }
     }
 
     lock() {

@@ -27,8 +27,8 @@ export const food = (items: Items) => {
                         .conversions([
                             conversion(`farmingHarvesting`)
                                 .amount(1)
-                                .inputs([items.labor(4, [modi(`irrigation`, 0.1)]), items.metal(0, [modi(`metalTools`, 0.05)])])
-                                .outputs([items.food(4.5, [modi(`irrigation`, 0.20), modi(`metalTools`, 1.5)])])
+                                .inputs([items.labor(1, [modi(`irrigation`, 0.1)]), items.metal(0, [modi(`metalTools`, 0.05)])])
+                                .outputs([items.food(1.1, [modi(`irrigation`, 0.20), modi(`metalTools`, 1.5)])])
                                 .complete()
                         ])
                         .button("build", "Sow more land",

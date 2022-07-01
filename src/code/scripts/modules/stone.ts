@@ -10,10 +10,11 @@ export const stone = (items: Items) => {
             module(`quarry`)
                 .name(`Stone Quarry`)
                 .description(`If your people are going to construct sturdier buildings, they will need stone
-                A quarry will supply what is needed.`)
+                A quarry will supply what is needed.
+                If you are short on labor, reducing the amount used for quarrying can help you grow.`)
                 .conversions([
                     conversion(`stoneQuarrying`)
-                        .inputs([items.labor(5, [modi(`quarryRoads`, -0.5), modi(`quarryDepletions`, 0.01), modi(`passiveQuarries`, 0.1)]), items.metal(0, [modi(`metalTools`, 0.05)])])
+                        .inputs([items.labor(2, [modi(`quarryRoads`, -0.5), modi(`quarryDepletions`, 0.01), modi(`passiveQuarries`, 0.1)]), items.metal(0, [modi(`metalTools`, 0.05)])])
                         .outputs([items.stone(1, [modi(`metalTools`, 0.5)])])
                         .modifier(`completions`, `quarryDepletions`)
                         .amount(1)

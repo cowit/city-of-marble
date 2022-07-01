@@ -1,4 +1,4 @@
-import { EventHandler } from "../components/events.js";
+import { EventHandler } from "./components/events.js";
 export class modifierSelector {
     constructor(value, modifierID) {
         this.value = value;

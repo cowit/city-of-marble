@@ -62,8 +62,8 @@ export const territory = (items) => {
                 .hideButtons()
                 .complete(),
             conversion(`popGrowthWorkForce`)
-                .inputs([items.food(4, [modi(`cityLevel`), modi(`campLevel`, 0.5)])])
-                .outputs([items.labor(4, [modi(`cityLevel`), modi(`campLevel`, 0.5)])])
+                .inputs([items.food(1, [modi(`cityLevel`), modi(`campLevel`, 0.5)])])
+                .outputs([items.labor(1, [modi(`cityLevel`), modi(`campLevel`, 0.5)])])
                 .amount(1)
                 .complete()
         ])

@@ -35,7 +35,7 @@ export const territory = (items) => {
             .conversions([
             conversion(`outskirtsWood`)
                 .amount(1)
-                .inputs([items.labor(5), items.metal(0, [modi(`metalTools`, 0.05)])])
+                .inputs([items.labor(2), items.metal(0, [modi(`metalTools`, 0.05)])])
                 .outputs([items.wood(1, [modi(`outskirtPatrols`, 0.5), modi(`metalTools`, 0.5)])])
                 .complete()
         ])
@@ -62,8 +62,8 @@ export const territory = (items) => {
                 .hideButtons()
                 .complete(),
             conversion(`popGrowthWorkForce`)
-                .inputs([items.food(1, [modi(`cityLevel`), modi(`campLevel`, 0.5)])])
-                .outputs([items.labor(1, [modi(`cityLevel`), modi(`campLevel`, 0.5)])])
+                .inputs([items.food(0, [modi(`cityLevel`), modi(`campLevel`, 0.5)])])
+                .outputs([items.labor(0, [modi(`cityLevel`), modi(`campLevel`, 0.5)])])
                 .amount(1)
                 .complete()
         ])

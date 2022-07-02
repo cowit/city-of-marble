@@ -51,7 +51,8 @@ globalThis.tooltip = {
 }
 
 
-setInterval(game.activate.bind(game), 1000)
+setInterval(game.activate.bind(game), 2000)
+loadSaveFile(window.localStorage.getItem(`saveFile`), earth)
 //setInterval(() => { saveModuleHandler(earth) }, 10000)
 $(`#save-button`).on("click", () => { saveModuleHandler(earth) })
 $(`#load-button`).on("click", () => { loadSaveFile(window.localStorage.getItem(`saveFile`), earth) })

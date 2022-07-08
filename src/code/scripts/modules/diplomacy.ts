@@ -6,6 +6,7 @@ import { module, ModuleExporter, unlock } from "../module.js";
 export const diplomacy = (items: Items) => {
     return new ModuleExporter(
         "diplomacy",
+        "Diplomacy",
         [
             module(`diplomats`)
                 .name(`Foreign Friends`)

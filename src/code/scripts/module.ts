@@ -1,6 +1,6 @@
 import { EventHandler } from "./components/events.js";
 import { ModifiableVariable, ModifierHandler, ModifierReference } from "./modifiers.js";
-import { Conversion } from "./conversions.js";
+import { conversion, Conversion } from "./conversions.js";
 import { Item, ItemRef, Items } from "./data/items.js";
 import { ModuleHandler } from "./module-handler.js";
 import { UIComponent } from "./ui.js";
@@ -89,6 +89,7 @@ export class ModuleArguments {
 
     button(type: "build" | "trigger" | "buildIncreaseAmount", title: string, cost: Conversion, transform?: string) {
         cost.build()
+
         this._buttons.push(new ModuleButton(type, title, cost, transform))
         return this
     }
@@ -107,6 +108,7 @@ export class ModuleArguments {
 
     complete() {
         const mod = (items: Items, lineID: string) => {
+
             if (!this._id) throw new Error(`A Module Does not have an ID assigned to it.`)
             if (!this._name) throw new Error(`Module ${this._id} does not have a Name assigned to it.`)
             const module = new Module(items,
@@ -138,7 +140,9 @@ export class ModuleButton {
         public title: string,
         public cost: Conversion,
         public transform?: string
-    ) { }
+    ) {
+
+    }
 }
 
 export function module(id: string) {
@@ -158,7 +162,8 @@ export class Module {
     transformID?: string
     //History of transforms used for saving
     transformHistory: string[] = []
-
+    //is true when this module is disabled, meaning it won't unlock again.
+    disabled: boolean = false
 
     constructor(
         public items: Items,
@@ -178,35 +183,38 @@ export class Module {
 
     //Called on each activation cycle
     activate() {
-        //Check the unlock conditions. If all succeed this module will be unlocked.
-        if (!this.unlocked && this.unlockConditions.length > 0) {
-            this.checkUnlocks()
-        }
-
-        //Don't check the conversions of a locked Module
-        if (this.unlocked) {
-            if (this.transforms.size > 0) {
-
-                this.transforms.forEach(trans => {
-
-                    if (trans._unlockConditions.length > 0) {
-                        var allTrue = true
-                        trans._unlockConditions.forEach((uC) => {
-                            if (!uC.check()) allTrue = false
-                        })
-                        if (allTrue && trans._id) this.transform(trans._id)
-                    }
-                })
-
+        if (!this.disabled) {
+            //Check the unlock conditions. If all succeed this module will be unlocked.
+            if (!this.unlocked && this.unlockConditions.length > 0) {
+                this.checkUnlocks()
             }
-            //Check the conversions, which will consume/output resources
-            this.conversions.forEach(con => {
-                con.checkConversion()
-            })
+
+            //Don't check the conversions of a locked Module
+            if (this.unlocked) {
+                if (this.transforms.size > 0) {
+
+                    this.transforms.forEach(trans => {
+
+                        if (trans._unlockConditions.length > 0) {
+                            var allTrue = true
+                            trans._unlockConditions.forEach((uC) => {
+                                if (!uC.check()) allTrue = false
+                            })
+                            if (allTrue && trans._id) this.transform(trans._id)
+                        }
+                    })
+
+                }
+                //Check the conversions, which will consume/output resources
+                this.conversions.forEach(con => {
+                    con.checkConversion()
+                })
+            }
         }
     }
 
     checkUnlocks() {
+
         var allTrue = true
         this.unlockConditions.forEach((uC) => {
             if (uC.check() === false) allTrue = false
@@ -228,7 +236,7 @@ export class Module {
         if (this.lockIDs) {
             this.lockIDs.forEach(id => {
                 const module = game.currentPlanet().modules.get(id)
-                if (module) module.lock()
+                if (module) module.disable()
                 else console.warn(`Could not find module ${id} to lock after unlocked ${this.id}`)
             })
         }
@@ -236,6 +244,11 @@ export class Module {
 
     lock() {
         this.unlocked = false
+        this.uiComponent?.hide()
+    }
+
+    disable() {
+        this.disabled = false
         this.uiComponent?.hide()
     }
 
@@ -258,6 +271,6 @@ export class Module {
 }
 
 export class ModuleExporter {
-    constructor(public id: string, public modArray: ((items: Items, lineID: string) => Module)[]) { }
+    constructor(public id: string, public name: string, public modArray: ((items: Items, lineID: string) => Module)[]) { }
 }
 

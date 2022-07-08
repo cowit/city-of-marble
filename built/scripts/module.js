@@ -154,34 +154,38 @@ export class Module {
         this.modifiers = new ModifierHandler();
         //History of transforms used for saving
         this.transformHistory = [];
+        //is true when this module is disabled, meaning it won't unlock again.
+        this.disabled = false;
         if (unlockConditions.length > 0)
             this.unlocked = false;
     }
     //Called on each activation cycle
     activate() {
-        //Check the unlock conditions. If all succeed this module will be unlocked.
-        if (!this.unlocked && this.unlockConditions.length > 0) {
-            this.checkUnlocks();
-        }
-        //Don't check the conversions of a locked Module
-        if (this.unlocked) {
-            if (this.transforms.size > 0) {
-                this.transforms.forEach(trans => {
-                    if (trans._unlockConditions.length > 0) {
-                        var allTrue = true;
-                        trans._unlockConditions.forEach((uC) => {
-                            if (!uC.check())
-                                allTrue = false;
-                        });
-                        if (allTrue && trans._id)
-                            this.transform(trans._id);
-                    }
+        if (!this.disabled) {
+            //Check the unlock conditions. If all succeed this module will be unlocked.
+            if (!this.unlocked && this.unlockConditions.length > 0) {
+                this.checkUnlocks();
+            }
+            //Don't check the conversions of a locked Module
+            if (this.unlocked) {
+                if (this.transforms.size > 0) {
+                    this.transforms.forEach(trans => {
+                        if (trans._unlockConditions.length > 0) {
+                            var allTrue = true;
+                            trans._unlockConditions.forEach((uC) => {
+                                if (!uC.check())
+                                    allTrue = false;
+                            });
+                            if (allTrue && trans._id)
+                                this.transform(trans._id);
+                        }
+                    });
+                }
+                //Check the conversions, which will consume/output resources
+                this.conversions.forEach(con => {
+                    con.checkConversion();
                 });
             }
-            //Check the conversions, which will consume/output resources
-            this.conversions.forEach(con => {
-                con.checkConversion();
-            });
         }
     }
     checkUnlocks() {
@@ -207,7 +211,7 @@ export class Module {
             this.lockIDs.forEach(id => {
                 const module = game.currentPlanet().modules.get(id);
                 if (module)
-                    module.lock();
+                    module.disable();
                 else
                     console.warn(`Could not find module ${id} to lock after unlocked ${this.id}`);
             });
@@ -216,6 +220,11 @@ export class Module {
     lock() {
         var _a;
         this.unlocked = false;
+        (_a = this.uiComponent) === null || _a === void 0 ? void 0 : _a.hide();
+    }
+    disable() {
+        var _a;
+        this.disabled = false;
         (_a = this.uiComponent) === null || _a === void 0 ? void 0 : _a.hide();
     }
     //Transform this module using a set of module arguments.
@@ -236,8 +245,9 @@ export class Module {
     }
 }
 export class ModuleExporter {
-    constructor(id, modArray) {
+    constructor(id, name, modArray) {
         this.id = id;
+        this.name = name;
         this.modArray = modArray;
     }
 }

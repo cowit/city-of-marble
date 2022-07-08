@@ -125,6 +125,7 @@ body {
 .button-title {
     text-align: center;
     margin: 7px 0 7px 0;
+    white-space: pre-line;
 }
 
 .module-button {

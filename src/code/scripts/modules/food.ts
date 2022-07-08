@@ -6,6 +6,7 @@ import { module, ModuleExporter, unlock } from "../module.js";
 export const food = (items: Items) => {
     return new ModuleExporter(
         "food",
+        "Farming",
         [
 
             module(`farming`)

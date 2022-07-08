@@ -6,6 +6,7 @@ import { module, ModuleExporter, unlock } from "../module.js";
 export const main = (items: Items) => {
     return new ModuleExporter(
         "main",
+        "Start",
         [
             module(`start`)
                 .name(`Start Off`)

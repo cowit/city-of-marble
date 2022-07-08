@@ -121,7 +121,7 @@ export class UIComponent {
 
         const tab = $(/*html*/`
             <div class="tab button" id="${modLine.id}">
-                ${modLine.id}
+                ${modLine.name}
             </div>
         `)
 

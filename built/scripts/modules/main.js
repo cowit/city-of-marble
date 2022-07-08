@@ -1,7 +1,7 @@
 import { conversion } from "../conversions.js";
 import { module, ModuleExporter, unlock } from "../module.js";
 export const main = (items) => {
-    return new ModuleExporter("main", [
+    return new ModuleExporter("main", "Start", [
         module(`start`)
             .name(`Start Off`)
             .description(`Begin your journey, breaking off from your group with your family a few others to continue your growth.`)

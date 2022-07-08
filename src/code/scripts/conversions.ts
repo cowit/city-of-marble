@@ -4,7 +4,7 @@ import { ItemRef } from "./data/items.js"
 type conversionProperty = "amount" | "completions" | "current" | "clear"
 
 export class modifierSelector {
-    constructor(public value: conversionProperty | number, public modifierID: string) { }
+    constructor(public value: conversionProperty | number | string, public modifierID: string) { }
 }
 
 export class ConversionArguments {
@@ -15,6 +15,7 @@ export class ConversionArguments {
     private _amount?: number
     private _id?: string
     private _displayButtons: boolean = true
+    private _lock?: "module" | "button" | "both"
 
     inputs(inputs: ItemRef[]) {
         this._inputs = inputs
@@ -28,7 +29,7 @@ export class ConversionArguments {
         this._onFinish = onFinish
         return this
     }
-    modifier(value: conversionProperty | number, modifierID: string) {
+    modifier(value: conversionProperty | number | string, modifierID: string) {
         this._modifierSelectors.push(new modifierSelector(value, modifierID))
         return this
     }

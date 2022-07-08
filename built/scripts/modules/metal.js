@@ -1,14 +1,14 @@
 import { conversion } from "../conversions.js";
 import { module, ModuleExporter, unlock } from "../module.js";
 export const metal = (items) => {
-    return new ModuleExporter("metal", [
+    return new ModuleExporter("metal", "Metallurgy", [
         module(`mine`)
             .name(`Native Copper`)
             .description(`The land is rich with small nuggets of glimmering native copper laying on the surface.
                 Flecked with small blue patches of corrosion dot the surface. Your people seem to enjoy collecting the nuggets.`)
             .conversions([
             conversion(`metalMining`)
-                .inputs([items.labor(5)])
+                .inputs([items.labor(4)])
                 .outputs([items.metalOre(1)])
                 .amount(1)
                 .complete()
@@ -25,7 +25,7 @@ export const metal = (items) => {
                 It might be beneficial to create some camp fires set aside just for working the metals.`)
             .conversions([
             conversion(`campfireSmelting`)
-                .inputs([items.metalOre(5)])
+                .inputs([items.labor(5), items.metalOre(5)])
                 .outputs([items.metal(1)])
                 .amount(1)
                 .complete()

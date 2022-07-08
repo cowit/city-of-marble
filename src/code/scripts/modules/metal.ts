@@ -6,6 +6,7 @@ import { module, ModuleExporter, unlock } from "../module.js";
 export const metal = (items: Items) => {
     return new ModuleExporter(
         "metal",
+        "Metallurgy",
         [
             module(`mine`)
                 .name(`Native Copper`)
@@ -13,7 +14,7 @@ export const metal = (items: Items) => {
                 Flecked with small blue patches of corrosion dot the surface. Your people seem to enjoy collecting the nuggets.`)
                 .conversions([
                     conversion(`metalMining`)
-                        .inputs([items.labor(5)])
+                        .inputs([items.labor(4)])
                         .outputs([items.metalOre(1)])
                         .amount(1)
                         .complete()
@@ -33,7 +34,7 @@ export const metal = (items: Items) => {
                 It might be beneficial to create some camp fires set aside just for working the metals.`)
                 .conversions([
                     conversion(`campfireSmelting`)
-                        .inputs([items.metalOre(5)])
+                        .inputs([items.labor(5), items.metalOre(5)])
                         .outputs([items.metal(1)])
                         .amount(1)
                         .complete()

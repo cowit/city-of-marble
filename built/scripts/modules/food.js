@@ -2,7 +2,7 @@ import { modi } from "../modifiers.js";
 import { conversion } from "../conversions.js";
 import { module, ModuleExporter, unlock } from "../module.js";
 export const food = (items) => {
-    return new ModuleExporter("food", [
+    return new ModuleExporter("food", "Farming", [
         module(`farming`)
             .name("Plant Seeds")
             .description(`Plant some seeds from the most delicious crops in the muddy earth.`)

@@ -6,6 +6,7 @@ import { module, ModuleExporter, unlock } from "../module.js";
 export const territory = (items: Items) => {
     return new ModuleExporter(
         "territory",
+        "Settlement",
         [
             module(`shelter`)
                 .name("Set Up Camp")
@@ -79,8 +80,8 @@ export const territory = (items: Items) => {
                         .hideButtons()
                         .complete(),
                     conversion(`popGrowthWorkForce`)
-                        .inputs([items.food(0, [modi(`cityLevel`), modi(`campLevel`, 0.5)])])
-                        .outputs([items.labor(0, [modi(`cityLevel`), modi(`campLevel`, 0.5)])])
+                        .inputs([items.food(0.5, [modi(`cityLevel`), modi(`campLevel`, 0.5)])])
+                        .outputs([items.labor(0.5, [modi(`cityLevel`), modi(`campLevel`, 0.5)])])
                         .amount(1)
                         .complete()
                 ])

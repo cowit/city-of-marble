@@ -2,7 +2,7 @@ import { conversion } from "../conversions.js";
 import { modi } from "../modifiers.js";
 import { module, ModuleExporter, unlock } from "../module.js";
 export const diplomacy = (items) => {
-    return new ModuleExporter("diplomacy", [
+    return new ModuleExporter("diplomacy", "Diplomacy", [
         module(`diplomats`)
             .name(`Foreign Friends`)
             .description(`Carouse and spend time with your foreign allies.

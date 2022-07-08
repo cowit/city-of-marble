@@ -2,7 +2,7 @@ import { conversion } from "../conversions.js";
 import { modi } from "../modifiers.js";
 import { module, ModuleExporter, unlock } from "../module.js";
 export const territory = (items) => {
-    return new ModuleExporter("territory", [
+    return new ModuleExporter("territory", "Settlement", [
         module(`shelter`)
             .name("Set Up Camp")
             .description(`Set up temporary camps to return to.
@@ -62,8 +62,8 @@ export const territory = (items) => {
                 .hideButtons()
                 .complete(),
             conversion(`popGrowthWorkForce`)
-                .inputs([items.food(0, [modi(`cityLevel`), modi(`campLevel`, 0.5)])])
-                .outputs([items.labor(0, [modi(`cityLevel`), modi(`campLevel`, 0.5)])])
+                .inputs([items.food(0.5, [modi(`cityLevel`), modi(`campLevel`, 0.5)])])
+                .outputs([items.labor(0.5, [modi(`cityLevel`), modi(`campLevel`, 0.5)])])
                 .amount(1)
                 .complete()
         ])

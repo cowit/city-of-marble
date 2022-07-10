@@ -1,3 +1,4 @@
+import { ModifierReference } from "./modifiers.js";
 import { ModuleHandler } from "./module-handler.js";
 
 export class Game {

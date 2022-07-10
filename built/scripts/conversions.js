@@ -10,6 +10,7 @@ export class ConversionArguments {
         this._inputs = [];
         this._outputs = [];
         this._modifierSelectors = [];
+        this._amount = { total() { return this.value; }, value: 0 };
         this._displayButtons = true;
     }
     inputs(inputs) {
@@ -28,8 +29,24 @@ export class ConversionArguments {
         this._modifierSelectors.push(new modifierSelector(value, modifierID));
         return this;
     }
-    amount(value) {
-        this._amount = value;
+    amount(baseValue = 0, modifier) {
+        if (!modifier)
+            this._amount = { total() { return this.value; }, value: baseValue };
+        else {
+            if (Array.isArray(modifier)) {
+                var modVar;
+                modifier.forEach(mod => {
+                    if (modVar)
+                        this._amount = game.currentPlanet().globalModifiers.subscribe(mod, modVar);
+                    else
+                        modVar = game.currentPlanet().globalModifiers.subscribe(mod, baseValue);
+                });
+                if (modVar)
+                    this._amount = modVar;
+            }
+            else
+                this._amount = modifier;
+        }
         return this;
     }
     id(id) {
@@ -45,7 +62,7 @@ export class ConversionArguments {
             console.error(`No ID found for conversion. `, this);
             throw new Error(`No ID given.`);
         }
-        const con = new Conversion(this._id, this._inputs, this._outputs, this._modifierSelectors, this._onFinish, this._amount, this._displayButtons);
+        const con = new Conversion(this._id, this._inputs, this._outputs, this._modifierSelectors, this._amount, this._onFinish, this._displayButtons);
         game.currentPlanet().conversions.set(this._id, con);
         return con;
     }
@@ -56,18 +73,18 @@ export function conversion(id) {
     return conArg;
 }
 export class Conversion {
-    constructor(id, inputs, outputs, modifierSelectors, onFinish, amount = 0, displayButtons = true) {
+    constructor(id, inputs, outputs, modifierSelectors, amount, onFinish, displayButtons = true) {
         this.id = id;
         this.inputs = inputs;
         this.outputs = outputs;
         this.modifierSelectors = modifierSelectors;
+        this.amount = amount;
         this.onFinish = onFinish;
         this.displayButtons = displayButtons;
-        this.amount = 0;
         this.current = 0;
         this.completions = 0;
         this.onAmountChange = new EventHandler();
-        this.build(amount);
+        this.build(this.amount.total());
     }
     checkConversion(complete) {
         //The maximum amount of conversion activations that can happen.
@@ -98,7 +115,7 @@ export class Conversion {
         }
     }
     build(amount = 1) {
-        this.amount += amount;
+        this.amount.value += amount;
         this.current += amount;
         this.inputs.forEach((inp) => {
             inp.trigger(`amountChange`);
@@ -109,7 +126,7 @@ export class Conversion {
         this.onAmountChange.trigger(this);
     }
     increaseCurrent(amount = 1) {
-        if (this.current < this.amount) {
+        if (this.current < this.amount.total()) {
             this.current += amount;
             this.onAmountChange.trigger(this);
             this.inputs.forEach((inp) => {
@@ -139,7 +156,7 @@ export class Conversion {
             this.modifierSelectors.forEach((mS) => {
                 //If the value selector is amount, replace it with the amount of this conversion.
                 if (mS.value === "amount") {
-                    game.currentPlanet().globalModifiers.set(mS.modifierID, this.id, this.amount);
+                    game.currentPlanet().globalModifiers.set(mS.modifierID, this.id, this.amount.total());
                 }
                 else if (mS.value === "completions") {
                     game.currentPlanet().globalModifiers.set(mS.modifierID, this.id, this.completions);
@@ -150,8 +167,11 @@ export class Conversion {
                 else if (mS.value === "clear") {
                     game.currentPlanet().globalModifiers.set(mS.modifierID, this.id, 0);
                 }
-                else if (typeof mS.value === "number" || typeof mS.value === "string") {
+                else if (typeof mS.value === "number") {
                     game.currentPlanet().globalModifiers.set(mS.modifierID, this.id, mS.value, true);
+                }
+                else if (typeof mS.value === "string") {
+                    game.currentPlanet().stringModifiers.set(mS.modifierID, this.id, mS.value, true);
                 }
             });
         }

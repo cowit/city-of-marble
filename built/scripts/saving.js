@@ -50,7 +50,7 @@ export function loadSaveFile(file, handler) {
             if (handler.items[ite.id] === undefined)
                 console.error(`Item ${ite.id} does not exist`);
             const item = handler.items[ite.id]();
-            item.amount(ite.amount);
+            item.set(ite.amount);
             if (ite.unlocked)
                 item.unlock();
             else

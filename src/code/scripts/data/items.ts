@@ -2,6 +2,7 @@ import { EventHandler } from "../components/events.js"
 import { ModifiableVariable, ModifierReference } from "../modifiers.js"
 import { Module } from "../module.js"
 import { itemIcon } from "../ui.js"
+import { Total } from "./interfaces.js"
 
 class ItemEvent {
     constructor(public newAmount: number, public item: Item) { }
@@ -9,7 +10,7 @@ class ItemEvent {
 
 export class Item {
     //Main Variables
-    public _amount = 0
+    public value = 0
     public capacity = 0
     public amountChange = {
         current: 0,
@@ -52,28 +53,28 @@ export class Item {
     checkAmount(divisor?: number) {
         //If a divisor is passed, divide the number by that amount. Else return the amount.
         if (divisor) {
-            return this._amount / Math.abs(divisor)
+            return this.value / Math.abs(divisor)
         }
-        else return this._amount
+        else return this.value
     }
 
     total() {
-        return this._amount
+        return this.value
     }
 
-    amount(newAmount: number) {
+    set(newAmount: number) {
         this.unlock()
         //If the capacity is set to 0, uncap it. Otherwise cap it.
         if (this.capacities.size !== 0) newAmount = Math.min(this.capacity, newAmount)
-        this._amount = newAmount
+        this.value = newAmount
 
         //When the amount changes, call the amountChange event for all listeners.
-        this.onAmountChange.trigger(new ItemEvent(this._amount, this))
+        this.onAmountChange.trigger(new ItemEvent(this.value, this))
         return this
     }
 
     add(addend: number) {
-        this.amount(this._amount + addend)
+        this.set(this.value + addend)
         this.amountChange.next += addend
         return this
     }
@@ -85,7 +86,7 @@ export class Item {
     }
 
     trigger(eventType: "amountChange" | "totalChange" | "modifierChange" | "activation") {
-        this.events.get(eventType)?.trigger(new ItemEvent(this._amount, this))
+        this.events.get(eventType)?.trigger(new ItemEvent(this.value, this))
     }
 
     addCapacity(capItem: Item, multiplier: number = 1) {
@@ -94,19 +95,19 @@ export class Item {
     }
 }
 
-export class ItemRef extends Item {
+export class ItemRef extends Item implements Total<number> {
     totalVar?: ModifiableVariable<number>
     constructor(public item: Item, refAmount: number, public modifiers?: ModifierReference[], public dontConsume: boolean = false) {
         super(item.id, item.name, item.icon)
-        this._amount = refAmount
+        this.value = refAmount
         if (modifiers && modifiers.length > 0) {
             modifiers.forEach((mod) => {
-                if (typeof this._amount === "number") {
+                if (typeof this.value === "number") {
                     if (this.totalVar) {
-                        this.totalVar = game.currentPlanet().globalModifiers.subscribe(mod, this.totalVar) as ModifiableVariable<number>
+                        this.totalVar = game.currentPlanet().globalModifiers.subscribe(mod, this.totalVar)
                     }
                     else {
-                        this.totalVar = game.currentPlanet().globalModifiers.subscribe(mod, this._amount) as ModifiableVariable<number>
+                        this.totalVar = game.currentPlanet().globalModifiers.subscribe(mod, this.value)
                     }
                 }
 
@@ -125,7 +126,7 @@ export class ItemRef extends Item {
         if (this.totalVar) {
             return this.totalVar.totalNumber
         }
-        else return this._amount
+        else return this.value
     }
 
 

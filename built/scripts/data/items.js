@@ -12,7 +12,7 @@ export class Item {
         this.name = name;
         this.icon = icon;
         //Main Variables
-        this._amount = 0;
+        this.value = 0;
         this.capacity = 0;
         this.amountChange = {
             current: 0,
@@ -48,26 +48,26 @@ export class Item {
     checkAmount(divisor) {
         //If a divisor is passed, divide the number by that amount. Else return the amount.
         if (divisor) {
-            return this._amount / Math.abs(divisor);
+            return this.value / Math.abs(divisor);
         }
         else
-            return this._amount;
+            return this.value;
     }
     total() {
-        return this._amount;
+        return this.value;
     }
-    amount(newAmount) {
+    set(newAmount) {
         this.unlock();
         //If the capacity is set to 0, uncap it. Otherwise cap it.
         if (this.capacities.size !== 0)
             newAmount = Math.min(this.capacity, newAmount);
-        this._amount = newAmount;
+        this.value = newAmount;
         //When the amount changes, call the amountChange event for all listeners.
-        this.onAmountChange.trigger(new ItemEvent(this._amount, this));
+        this.onAmountChange.trigger(new ItemEvent(this.value, this));
         return this;
     }
     add(addend) {
-        this.amount(this._amount + addend);
+        this.set(this.value + addend);
         this.amountChange.next += addend;
         return this;
     }
@@ -80,7 +80,7 @@ export class Item {
     }
     trigger(eventType) {
         var _a;
-        (_a = this.events.get(eventType)) === null || _a === void 0 ? void 0 : _a.trigger(new ItemEvent(this._amount, this));
+        (_a = this.events.get(eventType)) === null || _a === void 0 ? void 0 : _a.trigger(new ItemEvent(this.value, this));
     }
     addCapacity(capItem, multiplier = 1) {
         this.capacities.set(capItem.id, new Capacity(this, capItem, multiplier));
@@ -94,15 +94,15 @@ export class ItemRef extends Item {
         this.item = item;
         this.modifiers = modifiers;
         this.dontConsume = dontConsume;
-        this._amount = refAmount;
+        this.value = refAmount;
         if (modifiers && modifiers.length > 0) {
             modifiers.forEach((mod) => {
-                if (typeof this._amount === "number") {
+                if (typeof this.value === "number") {
                     if (this.totalVar) {
                         this.totalVar = game.currentPlanet().globalModifiers.subscribe(mod, this.totalVar);
                     }
                     else {
-                        this.totalVar = game.currentPlanet().globalModifiers.subscribe(mod, this._amount);
+                        this.totalVar = game.currentPlanet().globalModifiers.subscribe(mod, this.value);
                     }
                 }
             });
@@ -119,7 +119,7 @@ export class ItemRef extends Item {
             return this.totalVar.totalNumber;
         }
         else
-            return this._amount;
+            return this.value;
     }
 }
 class Capacity {

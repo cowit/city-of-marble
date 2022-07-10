@@ -27,7 +27,7 @@ export class UnlockCondition {
     check() {
         if (typeof this.condition === "string" || this.operator === "equals") {
             if (this.target instanceof ModifiableVariable) {
-                return this.target.total === this.condition;
+                return this.target.value === this.condition;
             }
             else if (this.target instanceof Item) {
                 return this.target.total() === this.condition;

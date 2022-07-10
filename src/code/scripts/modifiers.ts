@@ -1,4 +1,5 @@
 import { EventHandler } from "./components/events.js"
+import { Total } from "./data/interfaces.js"
 
 export function modi(id: string, multiplier: number = 1) { return new ModifierReference(id, multiplier) }
 
@@ -9,15 +10,21 @@ export class ModifierReference {
     ) { }
 }
 
-export class ModifiableVariable<variableType> {
-    total?: number | variableType
+export class ModifiableVariable<variableType> implements Total<number | variableType> {
+    value: number | variableType = 0
     totalNumber: number = 0
     onModifierChange = new EventHandler<number | string>()
     constructor(
+        public parent: ModifierCollection<variableType>,
         public original: variableType
     ) {
-        this.total = original
+        this.value = original
         if (typeof original === "number") this.totalNumber = original
+    }
+
+    total() {
+        if (typeof this.value === "number") return this.totalNumber
+        else return this.value
     }
 }
 
@@ -28,7 +35,7 @@ export class ModifierHandler<modifierType> {
         var mods = this.modifiers.get(modifierID)
 
         if (!mods) {
-            mods = new ModifierCollection<modifierType>()
+            mods = new ModifierCollection<modifierType>(this)
             this.modifiers.set(modifierID, mods)
         }
         var mod = mods.get(owner)
@@ -45,7 +52,7 @@ export class ModifierHandler<modifierType> {
         var mods = this.modifiers.get(modifierRef.id)
         //If the list does not exist, create a new one and return undefined.
         if (!mods) {
-            mods = new ModifierCollection<modifierType>()
+            mods = new ModifierCollection<modifierType>(this)
             this.modifiers.set(modifierRef.id, mods)
         }
 
@@ -58,6 +65,8 @@ export class ModifierCollection<modifierType> {
     public collection = new Map<string, Modifier<modifierType>>()
     private modVariables = new EventHandler<[number, number, modifierType?]>()
     private total: [number, number, modifierType?] = [0, 0]
+
+    constructor(public parent: ModifierHandler<modifierType>) { }
 
     get(ownerID: string) {
         return this.collection.get(ownerID)
@@ -77,19 +86,19 @@ export class ModifierCollection<modifierType> {
         if (original instanceof ModifiableVariable) {
             this.modVariables.listen(() => {
                 original.totalNumber -= this.total[1] * modifierRef.multiplier
-                original.total = this.total[2]
+                original.value = this.total[2] || 0
                 original.onModifierChange.trigger(original.totalNumber)
 
             })
             return original
         }
         else {
-            const modVar = new ModifiableVariable<modifierType>(original)
+            const modVar = new ModifiableVariable<modifierType>(this, original)
             modVar.totalNumber -= this.total[1]
-            modVar.total = this.total[2]
+            modVar.value = this.total[2] || 0
             this.modVariables.listen(() => {
                 modVar.totalNumber -= this.total[1] * modifierRef.multiplier
-                modVar.total = this.total[2]
+                modVar.value = this.total[2] || 0
 
                 modVar.onModifierChange.trigger(modVar.totalNumber)
             })

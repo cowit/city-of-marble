@@ -17,7 +17,7 @@ earth.addModuleLine(diplomacy);
 earth.addModuleLine(metal);
 earth.addModuleLine(stone);
 earth.addModuleLine(temple);
-earth.items.unexploredLand().amount(10);
+earth.items.unexploredLand().set(10);
 //earth.items.housing().amount(1)
 //earth.items.land().amount(100)
 //earth.items.population().amount(50)

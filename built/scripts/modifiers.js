@@ -7,13 +7,21 @@ export class ModifierReference {
     }
 }
 export class ModifiableVariable {
-    constructor(original) {
+    constructor(parent, original) {
+        this.parent = parent;
         this.original = original;
+        this.value = 0;
         this.totalNumber = 0;
         this.onModifierChange = new EventHandler();
-        this.total = original;
+        this.value = original;
         if (typeof original === "number")
             this.totalNumber = original;
+    }
+    total() {
+        if (typeof this.value === "number")
+            return this.totalNumber;
+        else
+            return this.value;
     }
 }
 export class ModifierHandler {
@@ -23,7 +31,7 @@ export class ModifierHandler {
     set(modifierID, owner, value, increment) {
         var mods = this.modifiers.get(modifierID);
         if (!mods) {
-            mods = new ModifierCollection();
+            mods = new ModifierCollection(this);
             this.modifiers.set(modifierID, mods);
         }
         var mod = mods.get(owner);
@@ -41,7 +49,7 @@ export class ModifierHandler {
         var mods = this.modifiers.get(modifierRef.id);
         //If the list does not exist, create a new one and return undefined.
         if (!mods) {
-            mods = new ModifierCollection();
+            mods = new ModifierCollection(this);
             this.modifiers.set(modifierRef.id, mods);
         }
         //Return a modifierVariable which will keep it's amount updated with the modifier.
@@ -49,7 +57,8 @@ export class ModifierHandler {
     }
 }
 export class ModifierCollection {
-    constructor() {
+    constructor(parent) {
+        this.parent = parent;
         this.collection = new Map();
         this.modVariables = new EventHandler();
         this.total = [0, 0];
@@ -70,18 +79,18 @@ export class ModifierCollection {
         if (original instanceof ModifiableVariable) {
             this.modVariables.listen(() => {
                 original.totalNumber -= this.total[1] * modifierRef.multiplier;
-                original.total = this.total[2];
+                original.value = this.total[2] || 0;
                 original.onModifierChange.trigger(original.totalNumber);
             });
             return original;
         }
         else {
-            const modVar = new ModifiableVariable(original);
+            const modVar = new ModifiableVariable(this, original);
             modVar.totalNumber -= this.total[1];
-            modVar.total = this.total[2];
+            modVar.value = this.total[2] || 0;
             this.modVariables.listen(() => {
                 modVar.totalNumber -= this.total[1] * modifierRef.multiplier;
-                modVar.total = this.total[2];
+                modVar.value = this.total[2] || 0;
                 modVar.onModifierChange.trigger(modVar.totalNumber);
             });
             return modVar;

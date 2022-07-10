@@ -1,5 +1,7 @@
 import { EventHandler } from "./components/events.js"
-import { ItemRef } from "./data/items.js"
+import { Total } from "./data/interfaces.js"
+import { Item, ItemRef } from "./data/items.js"
+import { ModifiableVariable, Modifier, ModifierReference } from "./modifiers.js"
 
 type conversionProperty = "amount" | "completions" | "current" | "clear"
 
@@ -12,7 +14,7 @@ export class ConversionArguments {
     private _outputs: ItemRef[] = []
     private _modifierSelectors: modifierSelector[] = []
     private _onFinish?: Function
-    private _amount?: number
+    private _amount: Total<number> = { total() { return this.value }, value: 0 }
     private _id?: string
     private _displayButtons: boolean = true
     private _lock?: "module" | "button" | "both"
@@ -33,8 +35,21 @@ export class ConversionArguments {
         this._modifierSelectors.push(new modifierSelector(value, modifierID))
         return this
     }
-    amount(value: number) {
-        this._amount = value
+    amount(baseValue = 0, modifier?: ModifierReference[] | Item) {
+        if (!modifier) this._amount = { total() { return this.value }, value: baseValue }
+        else {
+            if (Array.isArray(modifier)) {
+                var modVar: ModifiableVariable<number> | undefined
+                modifier.forEach(mod => {
+                    if (modVar) this._amount = game.currentPlanet().globalModifiers.subscribe(mod, modVar)
+                    else modVar = game.currentPlanet().globalModifiers.subscribe(mod, baseValue)
+
+                })
+                if (modVar) this._amount = modVar
+            }
+            else this._amount = modifier
+
+        }
         return this
     }
     id(id: string) {
@@ -56,8 +71,8 @@ export class ConversionArguments {
             this._inputs,
             this._outputs,
             this._modifierSelectors,
-            this._onFinish,
             this._amount,
+            this._onFinish,
             this._displayButtons
         )
         game.currentPlanet().conversions.set(this._id, con)
@@ -72,7 +87,6 @@ export function conversion(id: string) {
 }
 
 export class Conversion {
-    amount = 0
     current = 0
     completions = 0
     onAmountChange = new EventHandler<Conversion>()
@@ -81,11 +95,11 @@ export class Conversion {
         public inputs: ItemRef[],
         public outputs: ItemRef[],
         public modifierSelectors: modifierSelector[],
+        public amount: Total<number>,
         public onFinish?: Function,
-        amount = 0,
         public displayButtons = true
     ) {
-        this.build(amount)
+        this.build(this.amount.total())
     }
 
     checkConversion(complete?: (() => void)) {
@@ -118,7 +132,7 @@ export class Conversion {
     }
 
     build(amount: number = 1) {
-        this.amount += amount
+        this.amount.value += amount
         this.current += amount
         this.inputs.forEach((inp) => {
             inp.trigger(`amountChange`)
@@ -132,7 +146,7 @@ export class Conversion {
     }
 
     increaseCurrent(amount = 1) {
-        if (this.current < this.amount) {
+        if (this.current < this.amount.total()) {
             this.current += amount
             this.onAmountChange.trigger(this)
             this.inputs.forEach((inp) => {
@@ -168,7 +182,7 @@ export class Conversion {
             this.modifierSelectors.forEach((mS) => {
                 //If the value selector is amount, replace it with the amount of this conversion.
                 if (mS.value === "amount") {
-                    game.currentPlanet().globalModifiers.set(mS.modifierID, this.id, this.amount)
+                    game.currentPlanet().globalModifiers.set(mS.modifierID, this.id, this.amount.total())
                 }
                 else if (mS.value === "completions") {
                     game.currentPlanet().globalModifiers.set(mS.modifierID, this.id, this.completions)
@@ -179,8 +193,11 @@ export class Conversion {
                 else if (mS.value === "clear") {
                     game.currentPlanet().globalModifiers.set(mS.modifierID, this.id, 0)
                 }
-                else if (typeof mS.value === "number" || typeof mS.value === "string") {
+                else if (typeof mS.value === "number") {
                     game.currentPlanet().globalModifiers.set(mS.modifierID, this.id, mS.value, true)
+                }
+                else if (typeof mS.value === "string") {
+                    game.currentPlanet().stringModifiers.set(mS.modifierID, this.id, mS.value, true)
                 }
 
             })

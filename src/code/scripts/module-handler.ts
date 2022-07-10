@@ -9,7 +9,7 @@ export class ModuleHandler {
     lines = new Map<string, ModuleLine>()
     moduleContainer = new UIComponent($(`#module-display`))
     modules = new Map<string, Module>()
-    globalModifiers = new ModifierHandler<number>()
+    globalModifiers = new ModifierHandler<number | string>()
     conversions = new Map<string, Conversion>()
 
     constructor(public name: string) {

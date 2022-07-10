@@ -150,7 +150,7 @@ export class Conversion {
                 else if (mS.value === "clear") {
                     game.currentPlanet().globalModifiers.set(mS.modifierID, this.id, 0);
                 }
-                else if (typeof mS.value === "number") {
+                else if (typeof mS.value === "number" || typeof mS.value === "string") {
                     game.currentPlanet().globalModifiers.set(mS.modifierID, this.id, mS.value, true);
                 }
             });

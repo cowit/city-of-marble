@@ -40,7 +40,7 @@ globalThis.tooltip = {
     },
     hide() { tooltipEle.hide(); }
 };
-setInterval(game.activate.bind(game), 2000);
+setInterval(game.activate.bind(game), 1000);
 loadSaveFile(window.localStorage.getItem(`saveFile`), earth);
 //setInterval(() => { saveModuleHandler(earth) }, 10000)
 $(`#save-button`).on("click", () => { saveModuleHandler(earth); });

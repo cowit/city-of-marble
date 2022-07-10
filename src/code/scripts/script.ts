@@ -51,7 +51,7 @@ globalThis.tooltip = {
 }
 
 
-setInterval(game.activate.bind(game), 2000)
+setInterval(game.activate.bind(game), 1000)
 
 loadSaveFile(window.localStorage.getItem(`saveFile`), earth)
 

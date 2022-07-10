@@ -34,8 +34,8 @@ export const metal = (items: Items) => {
                 It might be beneficial to create some camp fires set aside just for working the metals.`)
                 .conversions([
                     conversion(`campfireSmelting`)
-                        .inputs([items.labor(5), items.metalOre(5)])
-                        .outputs([items.metal(1)])
+                        .inputs([items.labor(5), items.metalOre(5, [modi(`forgeEfficiency`, -1)])])
+                        .outputs([items.metal(1, [modi(`forgeEfficiency`, 0.5)])])
                         .amount(1)
                         .complete()
                 ])

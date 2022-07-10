@@ -34,27 +34,56 @@ export const temple = (items: Items) => {
             module(`dedicateTemple`)
                 .name(`Dedicate The Temple`)
                 .description(`Dedicate your temple to a specific god which will help you in that area.`)
-                .button("trigger", `Dedicate to Expach
-                 You will gain bonusus when taking land.`,
+                .button("lock", `Dedicate to Expach
+                 Expach's followers will give their land to you..`,
                     conversion(`expach`)
                         .inputs([items.population(10)])
                         .modifier(`expach`, `templeGod`)
                         .complete()
                 )
+                .button("lock", `Dedicate to Vulkus
+                 Your forges will create more and stronger metals.`,
+                    conversion(`vulkus`)
+                        .inputs([items.population(10)])
+                        .modifier(`vulkus`, `templeGod`)
+                        .modifier(1, `forgeEfficiency`)
+                        .complete()
+                )
+                .button("lock", `Dedicate to Civine
+                 Your citizens will prosper in abundant housing and food.`,
+                    conversion(`civine`)
+                        .inputs([items.population(10)])
+                        .modifier(`civine`, `templeGod`)
+                        .modifier(1, `housingLandCost`)
+                        .complete()
+                )
                 .unlockConditions([unlock(items.temple(), "atleast", 100)], [`templeConstruction`])
                 .complete(),
             module(`expachTemple`)
-                .name(`Temple Of Expach`)
+                .name(`Temple of Expach`)
                 .description(`The temple dedicated to the god of expansion and bountiful land.
                 As their followers worship them, others will start to slowly cede land to their celestial commander.`)
                 .conversions([
                     conversion(`influentialGrowth`)
+                        .amount(1)
                         .inputs([items.labor(5)])
                         .outputs([items.land(0.01)])
                         .complete()
                 ])
                 .unlockConditions([unlock(modi(`templeGod`), "equals", "expach")], [`dedicateTemple`])
-                .complete()
+                .complete(),
+            module(`vulkusTemple`)
+                .name(`Temple of Vulkus`)
+                .description(`The temple dedicated to the god of the forge and metals.
+                Your forges will produce more metals. Sacrifice Wood for a burst of Metals.`)
+                .button("trigger", "Devote Wood", conversion("vulkusSacrifice")
+                    .amount(1)
+                    .inputs([items.wood(20)])
+                    .outputs([items.metal(5)])
+                    .complete()
+                )
+                .unlockConditions([unlock(modi(`templeGod`), "equals", "vulkus")], [`dedicateTemple`])
+                .complete(),
         ]
     )
 }

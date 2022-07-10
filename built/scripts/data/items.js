@@ -97,11 +97,13 @@ export class ItemRef extends Item {
         this._amount = refAmount;
         if (modifiers && modifiers.length > 0) {
             modifiers.forEach((mod) => {
-                if (this.totalVar) {
-                    this.totalVar = game.currentPlanet().globalModifiers.subscribe(mod, this.totalVar);
-                }
-                else {
-                    this.totalVar = game.currentPlanet().globalModifiers.subscribe(mod, this._amount);
+                if (typeof this._amount === "number") {
+                    if (this.totalVar) {
+                        this.totalVar = game.currentPlanet().globalModifiers.subscribe(mod, this.totalVar);
+                    }
+                    else {
+                        this.totalVar = game.currentPlanet().globalModifiers.subscribe(mod, this._amount);
+                    }
                 }
             });
             (_a = this.totalVar) === null || _a === void 0 ? void 0 : _a.onModifierChange.listen(() => {

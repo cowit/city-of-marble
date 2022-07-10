@@ -64,7 +64,7 @@ export function loadSaveFile(file, handler) {
                     module.transform(tra);
                 });
                 if (mod.unlocked) {
-                    module.unlock();
+                    module.unlock(true);
                 }
                 else
                     module.lock();

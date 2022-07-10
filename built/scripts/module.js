@@ -199,14 +199,16 @@ export class Module {
             this.onUnlock.trigger(this);
         }
     }
-    unlock() {
+    unlock(loading) {
         var _a;
         this.unlocked = true;
         (_a = this.uiComponent) === null || _a === void 0 ? void 0 : _a.show();
-        $(`#${this.lineID}`)
-            .show()
-            .find(`.unlock-marker`)
-            .show();
+        const lineUI = $(`#${this.lineID}`).show();
+        //If this module is being loaded, don't add the new module marker to the line ui
+        if (!loading) {
+            lineUI.find(`.unlock-marker`)
+                .show();
+        }
         if (this.lockIDs) {
             this.lockIDs.forEach(id => {
                 const module = game.currentPlanet().modules.get(id);

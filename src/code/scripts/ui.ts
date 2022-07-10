@@ -132,7 +132,7 @@ export class UIComponent {
 
         const exclamationMark = $(/*html*/`
         <i class="fa-solid fa-circle-exclamation unlock-marker"></i>
-        `)
+        `).hide()
         tab.append(exclamationMark)
 
         tab.hide()
@@ -275,6 +275,9 @@ export class UIComponent {
                         con.build()
                     })
                     button.cost.build()
+                }
+                else if (button.type === "lock") {
+                    module.disable()
                 }
 
                 if (button.transform) module.transform(button.transform)

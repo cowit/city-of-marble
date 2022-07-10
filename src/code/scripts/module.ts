@@ -87,7 +87,7 @@ export class ModuleArguments {
         return this
     }
 
-    button(type: "build" | "trigger" | "buildIncreaseAmount", title: string, cost: Conversion, transform?: string) {
+    button(type: "build" | "trigger" | "buildIncreaseAmount" | "lock", title: string, cost: Conversion, transform?: string) {
         cost.build()
 
         this._buttons.push(new ModuleButton(type, title, cost, transform))
@@ -136,7 +136,7 @@ export class ModuleArguments {
 
 export class ModuleButton {
     constructor(
-        public type: "build" | "trigger" | "buildIncreaseAmount",
+        public type: "build" | "trigger" | "buildIncreaseAmount" | "lock",
         public title: string,
         public cost: Conversion,
         public transform?: string
@@ -225,13 +225,16 @@ export class Module {
         }
     }
 
-    unlock() {
+    unlock(loading?: boolean) {
         this.unlocked = true
         this.uiComponent?.show()
-        $(`#${this.lineID}`)
-            .show()
-            .find(`.unlock-marker`)
-            .show()
+        const lineUI = $(`#${this.lineID}`).show()
+        //If this module is being loaded, don't add the new module marker to the line ui
+        if (!loading) {
+
+            lineUI.find(`.unlock-marker`)
+                .show()
+        }
 
         if (this.lockIDs) {
             this.lockIDs.forEach(id => {

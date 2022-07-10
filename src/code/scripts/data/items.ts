@@ -101,12 +101,15 @@ export class ItemRef extends Item {
         this._amount = refAmount
         if (modifiers && modifiers.length > 0) {
             modifiers.forEach((mod) => {
-                if (this.totalVar) {
-                    this.totalVar = game.currentPlanet().globalModifiers.subscribe(mod, this.totalVar)
+                if (typeof this._amount === "number") {
+                    if (this.totalVar) {
+                        this.totalVar = game.currentPlanet().globalModifiers.subscribe(mod, this.totalVar) as ModifiableVariable<number>
+                    }
+                    else {
+                        this.totalVar = game.currentPlanet().globalModifiers.subscribe(mod, this._amount) as ModifiableVariable<number>
+                    }
                 }
-                else {
-                    this.totalVar = game.currentPlanet().globalModifiers.subscribe(mod, this._amount)
-                }
+
             })
 
             this.totalVar?.onModifierChange.listen(() => {

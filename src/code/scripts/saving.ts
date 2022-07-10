@@ -6,7 +6,7 @@ class SaveObject {
     items: { id: string, amount: number, unlocked: boolean }[] = []
     modules: { id: string, transformHistory: string[], unlocked: boolean }[] = []
     conversions: { id: string, current: number, amount: number, completions: number }[] = []
-    modifiers: { ownerID: string, id: string, amount: number }[] = []
+    modifiers: { ownerID: string, id: string, amount: number | string }[] = []
 }
 
 export function saveModuleHandler(handler: ModuleHandler) {
@@ -72,7 +72,7 @@ export function loadSaveFile(file: any, handler: ModuleHandler) {
                     module.transform(tra)
                 })
                 if (mod.unlocked) {
-                    module.unlock()
+                    module.unlock(true)
                 }
                 else module.lock()
             }

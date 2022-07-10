@@ -5,13 +5,13 @@ import { Item, ItemRef, Items } from "./data/items.js";
 import { ModuleHandler } from "./module-handler.js";
 import { UIComponent } from "./ui.js";
 
-export function unlock(target: ModifierReference | Item, operator: `more` | `less` | `equals` | `atleast`, condition: number | string) {
+export function unlock(target: ModifierReference | Item, operator: `more` | `less` | `equals` | `atleast`, condition: number) {
     return new UnlockCondition(target, operator, condition)
 }
 
 export class UnlockCondition {
     constructor(
-        public target: ModifierReference | Item | ModifiableVariable<string | number>,
+        public target: ModifierReference | Item | ModifiableVariable<number>,
         public operator: `more` | `less` | `equals` | `atleast`,
         public condition: number | string
     ) {

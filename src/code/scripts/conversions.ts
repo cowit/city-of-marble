@@ -196,9 +196,6 @@ export class Conversion {
                 else if (typeof mS.value === "number") {
                     game.currentPlanet().globalModifiers.set(mS.modifierID, this.id, mS.value, true)
                 }
-                else if (typeof mS.value === "string") {
-                    game.currentPlanet().stringModifiers.set(mS.modifierID, this.id, mS.value, true)
-                }
 
             })
         }

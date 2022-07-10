@@ -9,7 +9,6 @@ export class ModuleHandler {
         this.moduleContainer = new UIComponent($(`#module-display`));
         this.modules = new Map();
         this.globalModifiers = new ModifierHandler();
-        this.stringModifiers = new ModifierHandler();
         this.conversions = new Map();
     }
     activate() {

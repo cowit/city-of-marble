@@ -38,14 +38,14 @@ export const temple = (items: Items) => {
                  Expach's followers will give their land to you..`,
                     conversion(`expach`)
                         .inputs([items.population(10)])
-                        .modifier(`expach`, `templeGod`)
+                        .modifier(1, `templeGod`)
                         .complete()
                 )
                 .button("lock", `Dedicate to Vulkus
                  Your forges will create more and stronger metals.`,
                     conversion(`vulkus`)
                         .inputs([items.population(10)])
-                        .modifier(`vulkus`, `templeGod`)
+                        .modifier(2, `templeGod`)
                         .modifier(1, `forgeEfficiency`)
                         .complete()
                 )
@@ -70,7 +70,7 @@ export const temple = (items: Items) => {
                         .outputs([items.land(0.01)])
                         .complete()
                 ])
-                .unlockConditions([unlock(modi(`templeGod`), "equals", "expach")], [`dedicateTemple`])
+                .unlockConditions([unlock(modi(`templeGod`), "equals", 1)], [`dedicateTemple`])
                 .complete(),
             module(`vulkusTemple`)
                 .name(`Temple of Vulkus`)
@@ -82,7 +82,7 @@ export const temple = (items: Items) => {
                     .outputs([items.metal(5)])
                     .complete()
                 )
-                .unlockConditions([unlock(modi(`templeGod`), "equals", "vulkus")], [`dedicateTemple`])
+                .unlockConditions([unlock(modi(`templeGod`), "equals", 2)], [`dedicateTemple`])
                 .complete(),
         ]
     )

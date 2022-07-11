@@ -30,7 +30,7 @@ export function saveModuleHandler(handler) {
         jsonSaver.conversions.push({
             id: con.id,
             current: con.current,
-            amount: con.amount,
+            amount: con.amount.total(),
             completions: con.completions
         });
     });
@@ -77,7 +77,7 @@ export function loadSaveFile(file, handler) {
             const conversion = handler.conversions.get(con.id);
             if (conversion) {
                 conversion.current = con.current;
-                conversion.amount = con.amount;
+                conversion.amount.value = con.amount;
                 conversion.completions = con.completions;
                 conversion.inputs.forEach((inp) => {
                     inp.trigger(`amountChange`);

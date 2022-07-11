@@ -13,7 +13,7 @@ export class ModifierReference {
 export class ModifiableVariable<variableType> implements Total<number | variableType> {
     value: number | variableType = 0
     totalNumber: number = 0
-    onModifierChange = new EventHandler<number | string>()
+    onModifierChange = new EventHandler<number>()
     constructor(
         public parent: ModifierCollection<variableType>,
         public original: variableType

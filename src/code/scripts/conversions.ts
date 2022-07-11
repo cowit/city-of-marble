@@ -36,8 +36,8 @@ export class ConversionArguments {
         return this
     }
     amount(baseValue = 0, modifier?: ModifierReference[] | Item) {
-        if (!modifier) this._amount = { total() { return this.value }, value: baseValue }
-        else {
+        this._amount = { total() { return this.value }, value: baseValue }
+        if (modifier) {
             if (Array.isArray(modifier)) {
                 var modVar: ModifiableVariable<number> | undefined
                 modifier.forEach(mod => {
@@ -45,10 +45,19 @@ export class ConversionArguments {
                     else modVar = game.currentPlanet().globalModifiers.subscribe(mod, baseValue)
 
                 })
-                if (modVar) this._amount = modVar
+                if (modVar) {
+                    this._amount = modVar
+                    modVar.onModifierChange.listen((value) => {
+                        this._amount.value = value
+                    })
+                }
             }
-            else this._amount = modifier
-
+            else {
+                this._amount.value = modifier.value
+                modifier.onAmountChange.listen((value) => {
+                    this._amount.value = Math.floor(value.newAmount)
+                })
+            }
         }
         return this
     }

@@ -53,7 +53,7 @@ export const temple = (items: Items) => {
                  Your citizens will prosper in abundant housing and food.`,
                     conversion(`civine`)
                         .inputs([items.population(10)])
-                        .modifier(`civine`, `templeGod`)
+                        .modifier(3, `templeGod`)
                         .modifier(1, `housingLandCost`)
                         .complete()
                 )
@@ -84,6 +84,13 @@ export const temple = (items: Items) => {
                 )
                 .unlockConditions([unlock(modi(`templeGod`), "equals", 2)], [`dedicateTemple`])
                 .complete(),
+            module(`civineTemple`)
+                .name(`Temple of Civine`)
+                .description(`The temple dedicated to the god of the citizenry.
+                The followers will build more compact housing and consume less food.
+                `)
+                .unlockConditions([unlock(modi(`templeGod`), "equals", 3)], [`dedicateTemple`])
+                .complete()
         ]
     )
 }

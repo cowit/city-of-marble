@@ -152,7 +152,7 @@ export class UIComponent {
             `);
         }
         const amountButtons = comp.find(`.amount-controls`);
-        if (con.amount < 1)
+        if (con.amount.total() < 1)
             amountButtons.hide();
         const currentEle = comp.find(`.current`);
         const amountEle = comp.find(`.maximum`);
@@ -163,12 +163,12 @@ export class UIComponent {
             con.decreaseCurrent();
         });
         con.onAmountChange.listen(() => {
-            if (con.amount < 1)
+            if (con.amount.total() < 1)
                 amountButtons.hide();
             else
                 amountButtons.show();
             currentEle.text(con.current);
-            amountEle.text(con.amount);
+            amountEle.text(con.amount.total());
         });
         //Create the UI component.
         const uic = new UIComponent(comp);

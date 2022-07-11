@@ -62,9 +62,9 @@ export const territory = (items) => {
                 .hideButtons()
                 .complete(),
             conversion(`popGrowthWorkForce`)
-                .inputs([items.food(0.5, [modi(`cityLevel`), modi(`campLevel`, 0.5), modi(`civineBlessing`, -0.01)])])
-                .outputs([items.labor(0.5, [modi(`cityLevel`), modi(`campLevel`, 0.5)])])
-                .amount(1)
+                .inputs([items.food(0.5, [modi(`civineBlessing`, -0.01)])])
+                .outputs([items.labor(0.5)])
+                .amount(1, items.population())
                 .complete()
         ])
             .complete()

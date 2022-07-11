@@ -6,7 +6,7 @@ class SaveObject {
     items: { id: string, amount: number, unlocked: boolean }[] = []
     modules: { id: string, transformHistory: string[], unlocked: boolean }[] = []
     conversions: { id: string, current: number, amount: number, completions: number }[] = []
-    modifiers: { ownerID: string, id: string, amount: number | string }[] = []
+    modifiers: { ownerID: string, id: string, amount: number }[] = []
 }
 
 export function saveModuleHandler(handler: ModuleHandler) {
@@ -36,7 +36,7 @@ export function saveModuleHandler(handler: ModuleHandler) {
         jsonSaver.conversions.push({
             id: con.id,
             current: con.current,
-            amount: con.amount,
+            amount: con.amount.total(),
             completions: con.completions
         })
     })
@@ -85,7 +85,7 @@ export function loadSaveFile(file: any, handler: ModuleHandler) {
 
             if (conversion) {
                 conversion.current = con.current
-                conversion.amount = con.amount
+                conversion.amount.value = con.amount
                 conversion.completions = con.completions
 
                 conversion.inputs.forEach((inp) => {

@@ -248,8 +248,6 @@ export class UIComponent {
                 else if (button.type === "lock") {
                     module.disable();
                 }
-                if (button.transform)
-                    module.transform(button.transform);
             });
         });
         uic.parent = this;
@@ -296,20 +294,6 @@ export class ModuleLine extends UIComponent {
         //When this module is hovered over, hide the unlock marker.
         comp.on('mouseenter', () => {
             unlockMarker.hide();
-        });
-        mod.onTransform.listen(() => {
-            comp.find(`.module-name-text`).text(mod.name);
-            comp.find(`.module-description`).text(mod.description);
-            comp.find(`.conversion-wrapper`).remove();
-            mod.conversions.forEach(con => {
-                uic.conversionBox(con);
-            });
-            comp.find(`.module-button`).remove();
-            if (mod.buttons.length > 0) {
-                mod.buttons.forEach(but => {
-                    uic.moduleButton(but, mod);
-                });
-            }
         });
         //Hide modules which aren't unlocked yet. Set if there is any unlock conditions on the module.
         if (mod.unlocked === false)

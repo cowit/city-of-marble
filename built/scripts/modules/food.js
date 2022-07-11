@@ -10,11 +10,13 @@ export const food = (items) => {
             .button("trigger", `Plant seeds`, conversion(`farmingPlantSeed`)
             .inputs([items.food(1)])
             .outputs([])
-            .complete(), `fullFarming`)
-            .transform("fullFarming", module(`fullFarming`)
+            .modifier(1, `unlockFarming`)
+            .complete())
+            .complete(),
+        module(`fullFarming`)
             .name("Farming")
             .description(`Your people have begun to reap what they sowed previously.  
-                        This years growth in the area that you planted the seeds has grown better than any other.`)
+                This years growth in the area that you planted the seeds has grown better than any other.`)
             .conversions([
             conversion(`farmingHarvesting`)
                 .amount(1)
@@ -25,7 +27,8 @@ export const food = (items) => {
             .button("build", "Sow more land", conversion(`farmingSowMoreLand`)
             .inputs([items.land(1)])
             .modifier(`completions`, `farmsBuilt`)
-            .complete()))
+            .complete())
+            .unlockConditions([unlock(modi(`unlockFarming`), "equals", 1)], [`farming`])
             .complete(),
         module(`basicIrrigation`)
             .name("Basic Irrigation")

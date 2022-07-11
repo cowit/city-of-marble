@@ -4,7 +4,7 @@ import { ModuleHandler } from "./module-handler";
 
 class SaveObject {
     items: { id: string, amount: number, unlocked: boolean }[] = []
-    modules: { id: string, transformHistory: string[], unlocked: boolean }[] = []
+    modules: { id: string, unlocked: boolean }[] = []
     conversions: { id: string, current: number, amount: number, completions: number }[] = []
     modifiers: { ownerID: string, id: string, amount: number }[] = []
 }
@@ -26,7 +26,6 @@ export function saveModuleHandler(handler: ModuleHandler) {
     handler.modules.forEach((mod) => {
         jsonSaver.modules.push({
             id: mod.id,
-            transformHistory: mod.transformHistory,
             unlocked: mod.unlocked
         })
     })
@@ -67,10 +66,6 @@ export function loadSaveFile(file: any, handler: ModuleHandler) {
         jsonSave.modules.forEach((mod) => {
             const module = handler.modules.get(mod.id)
             if (module) {
-                mod.transformHistory.forEach((tra) => {
-
-                    module.transform(tra)
-                })
                 if (mod.unlocked) {
                     module.unlock(true)
                 }

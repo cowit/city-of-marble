@@ -64,7 +64,6 @@ export class ModuleArguments {
     public _conversions: Conversion[] = []
     private _buttons: ModuleButton[] = []
     private _description: string = ""
-    public _transforms = new Map<string, ModuleArguments>()
     public _unlockConditions: UnlockCondition[] = []
     public _lockIDs: string[] = []
     id(id: string) {
@@ -87,16 +86,10 @@ export class ModuleArguments {
         return this
     }
 
-    button(type: "build" | "trigger" | "buildIncreaseAmount" | "lock", title: string, cost: Conversion, transform?: string) {
+    button(type: "build" | "trigger" | "buildIncreaseAmount" | "lock", title: string, cost: Conversion) {
         cost.build()
 
-        this._buttons.push(new ModuleButton(type, title, cost, transform))
-        return this
-    }
-
-    transform(id: string, transform: ModuleArguments) {
-        transform.id(id)
-        this._transforms.set(id, transform)
+        this._buttons.push(new ModuleButton(type, title, cost))
         return this
     }
 
@@ -115,7 +108,7 @@ export class ModuleArguments {
                 this._id,
                 this._name,
                 this._description,
-                this._conversions, this._transforms,
+                this._conversions,
                 this._buttons,
                 this._unlockConditions,
                 true,
@@ -138,8 +131,7 @@ export class ModuleButton {
     constructor(
         public type: "build" | "trigger" | "buildIncreaseAmount" | "lock",
         public title: string,
-        public cost: Conversion,
-        public transform?: string
+        public cost: Conversion
     ) {
 
     }
@@ -152,16 +144,10 @@ export function module(id: string) {
 //The module is what the base interface which interacts with the planet.
 export class Module {
     uiComponent?: UIComponent
-    //Event handler which is triggered when the transform method is complete.
-    onTransform = new EventHandler<Module>()
     //Called when this is unlocked
     onUnlock = new EventHandler<Module>()
     //Modifier handler which allows accessing and setting modifiers at different points.
     modifiers = new ModifierHandler<number | string>()
-    //Transform ID used for saving
-    transformID?: string
-    //History of transforms used for saving
-    transformHistory: string[] = []
     //is true when this module is disabled, meaning it won't unlock again.
     disabled: boolean = false
 
@@ -171,7 +157,6 @@ export class Module {
         public name: string,
         public description: string,
         public conversions: Conversion[],
-        public transforms: Map<string, ModuleArguments>, //A map of module arguments which can be completed and overwrite this module.
         public buttons: ModuleButton[] = [],
         public unlockConditions: UnlockCondition[] = [],
         public unlocked: boolean = true,
@@ -191,20 +176,6 @@ export class Module {
 
             //Don't check the conversions of a locked Module
             if (this.unlocked) {
-                if (this.transforms.size > 0) {
-
-                    this.transforms.forEach(trans => {
-
-                        if (trans._unlockConditions.length > 0) {
-                            var allTrue = true
-                            trans._unlockConditions.forEach((uC) => {
-                                if (!uC.check()) allTrue = false
-                            })
-                            if (allTrue && trans._id) this.transform(trans._id)
-                        }
-                    })
-
-                }
                 //Check the conversions, which will consume/output resources
                 this.conversions.forEach(con => {
                     con.checkConversion()
@@ -253,23 +224,6 @@ export class Module {
     disable() {
         this.disabled = false
         this.uiComponent?.hide()
-    }
-
-    //Transform this module using a set of module arguments.
-    transform(transformID: string) {
-        //Attempt to get the transform from the transforms map.
-        const transform = this.transforms.get(transformID)?.complete()(this.items, this.lineID)
-
-        //Check that it pulls one that exists.
-        if (transform) {
-            this.transformID = transformID
-            this.transformHistory.push(transformID)
-            const { onTransform, id, transformHistory, ...transformExcluded } = transform
-            Object.assign(this, transformExcluded)
-            this.onTransform.trigger(this)
-        }
-        else console.warn(`Could not find transform ${transformID} on module ${this.id}`)
-
     }
 }
 

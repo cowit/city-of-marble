@@ -17,28 +17,28 @@ export const food = (items: Items) => {
                     conversion(`farmingPlantSeed`)
                         .inputs([items.food(1)])
                         .outputs([])
-                        .complete(),
-                    `fullFarming`
+                        .modifier(1, `unlockFarming`)
+                        .complete()
                 )
-                .transform("fullFarming",
-                    module(`fullFarming`)
-                        .name("Farming")
-                        .description(`Your people have begun to reap what they sowed previously.  
-                        This years growth in the area that you planted the seeds has grown better than any other.`)
-                        .conversions([
-                            conversion(`farmingHarvesting`)
-                                .amount(1)
-                                .inputs([items.labor(1, [modi(`irrigation`, 0.1)]), items.metal(0, [modi(`metalTools`, 0.05)])])
-                                .outputs([items.food(1.1, [modi(`irrigation`, 0.20), modi(`metalTools`, 1.5)])])
-                                .complete()
-                        ])
-                        .button("build", "Sow more land",
-                            conversion(`farmingSowMoreLand`)
-                                .inputs([items.land(1)])
-                                .modifier(`completions`, `farmsBuilt`)
-                                .complete()
-                        )
+                .complete(),
+            module(`fullFarming`)
+                .name("Farming")
+                .description(`Your people have begun to reap what they sowed previously.  
+                This years growth in the area that you planted the seeds has grown better than any other.`)
+                .conversions([
+                    conversion(`farmingHarvesting`)
+                        .amount(1)
+                        .inputs([items.labor(1, [modi(`irrigation`, 0.1)]), items.metal(0, [modi(`metalTools`, 0.05)])])
+                        .outputs([items.food(1.1, [modi(`irrigation`, 0.20), modi(`metalTools`, 1.5)])])
+                        .complete()
+                ])
+                .button("build", "Sow more land",
+                    conversion(`farmingSowMoreLand`)
+                        .inputs([items.land(1)])
+                        .modifier(`completions`, `farmsBuilt`)
+                        .complete()
                 )
+                .unlockConditions([unlock(modi(`unlockFarming`), "equals", 1)], [`farming`])
                 .complete(),
 
             module(`basicIrrigation`)

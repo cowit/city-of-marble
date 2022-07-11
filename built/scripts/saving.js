@@ -21,7 +21,6 @@ export function saveModuleHandler(handler) {
     handler.modules.forEach((mod) => {
         jsonSaver.modules.push({
             id: mod.id,
-            transformHistory: mod.transformHistory,
             unlocked: mod.unlocked
         });
     });
@@ -60,9 +59,6 @@ export function loadSaveFile(file, handler) {
         jsonSave.modules.forEach((mod) => {
             const module = handler.modules.get(mod.id);
             if (module) {
-                mod.transformHistory.forEach((tra) => {
-                    module.transform(tra);
-                });
                 if (mod.unlocked) {
                     module.unlock(true);
                 }

@@ -168,8 +168,8 @@ export class Items {
         this.stone = itemAccessor("stone", "Stone");
         this.temple = itemAccessor(`temple`, `Temple Progress`);
         this.diplomaticFavor = itemAccessor(`diplomaticFavor`, `Diplomatic Favor`);
-        this.population().addCapacity(this.housing(), 5);
-        this.labor().addCapacity(this.population(), 5);
+        this.population().addCapacity(this.housing(), 1);
+        this.labor().addCapacity(this.population(), 15);
     }
 }
 //# sourceMappingURL=items.js.map

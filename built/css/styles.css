@@ -18,7 +18,7 @@ html {
 }
 
 body {
-    background-color: #2667ff;
+    background-image: url(../assets/background.png);
     width: 100%;
     height: 100%;
 }
@@ -98,7 +98,8 @@ body {
 .items-display {
     width: 450px;
     height: 98%;
-    border: var(--dark-filter) 3px solid;
+    border: var(--border-filter) 4px solid;
+    background-color: var(--light-filter);
     border-top-right-radius: 15px;
     border-bottom-left-radius: 15px;
     margin-right: 15px;

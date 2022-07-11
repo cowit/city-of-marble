@@ -183,8 +183,8 @@ export class Items {
     diplomaticFavor = itemAccessor(`diplomaticFavor`, `Diplomatic Favor`)
 
     constructor() {
-        this.population().addCapacity(this.housing(), 5)
-        this.labor().addCapacity(this.population(), 5)
+        this.population().addCapacity(this.housing(), 1)
+        this.labor().addCapacity(this.population(), 15)
     }
 }
 

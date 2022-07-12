@@ -14,10 +14,12 @@ export class ModifiableVariable<variableType> implements Total<number | variable
     value: number | variableType = 0
     totalNumber: number = 0
     onModifierChange = new EventHandler<number>()
+    onAmountChange: EventHandler<number>
     constructor(
         public parent: ModifierCollection<variableType>,
         public original: variableType
     ) {
+        this.onAmountChange = this.onModifierChange
         this.value = original
         if (typeof original === "number") this.totalNumber = original
     }

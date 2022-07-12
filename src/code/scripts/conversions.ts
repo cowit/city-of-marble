@@ -14,7 +14,7 @@ export class ConversionArguments {
     private _outputs: ItemRef[] = []
     private _modifierSelectors: modifierSelector[] = []
     private _onFinish?: Function
-    private _amount: Total<number> = { total() { return this.value }, value: 0 }
+    private _amount: Total<number> = { total() { return this.value }, value: 0, onAmountChange: new EventHandler<number>() }
     private _id?: string
     private _displayButtons: boolean = true
     private _lock?: "module" | "button" | "both"
@@ -36,7 +36,7 @@ export class ConversionArguments {
         return this
     }
     amount(baseValue = 0, modifier?: ModifierReference[] | Item) {
-        this._amount = { total() { return this.value }, value: baseValue }
+        this._amount = { total() { return this.value }, value: baseValue, onAmountChange: this._amount.onAmountChange }
         if (modifier) {
             if (Array.isArray(modifier)) {
                 var modVar: ModifiableVariable<number> | undefined
@@ -54,8 +54,10 @@ export class ConversionArguments {
             }
             else {
                 this._amount.value = modifier.value
+                this._amount.onAmountChange.trigger(modifier.value)
                 modifier.onAmountChange.listen((value) => {
-                    this._amount.value = Math.floor(value.newAmount)
+                    this._amount.value = Math.floor(value)
+                    this._amount.onAmountChange.trigger(value)
                 })
             }
         }
@@ -109,6 +111,9 @@ export class Conversion {
         public displayButtons = true
     ) {
         this.build(this.amount.total())
+        this.amount.onAmountChange.listen((value) => {
+            this.onAmountChange.trigger(this)
+        })
     }
 
     checkConversion(complete?: (() => void)) {

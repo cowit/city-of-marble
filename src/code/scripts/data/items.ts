@@ -4,10 +4,6 @@ import { Module } from "../module.js"
 import { itemIcon } from "../ui.js"
 import { Total } from "./interfaces.js"
 
-class ItemEvent {
-    constructor(public newAmount: number, public item: Item) { }
-}
-
 export class Item {
     //Main Variables
     public value = 0
@@ -21,12 +17,12 @@ export class Item {
     public unlocked = false
 
     //Events
-    public onAmountChange = new EventHandler<ItemEvent>()
-    public onTotalChange = new EventHandler<ItemEvent>()
-    public onModifierChange = new EventHandler<ItemEvent>()
-    public onActivation = new EventHandler<ItemEvent>()
+    public onAmountChange = new EventHandler<number>()
+    public onTotalChange = new EventHandler<number>()
+    public onModifierChange = new EventHandler<number>()
+    public onActivation = new EventHandler<number>()
     public onUnlockToggle = new EventHandler<boolean>()
-    protected events = new Map<string, EventHandler<ItemEvent>>()
+    protected events = new Map<string, EventHandler<number>>()
         .set(`amountChange`, this.onAmountChange)
         .set(`totalChange`, this.onTotalChange)
         .set(`modifierChange`, this.onModifierChange)
@@ -67,9 +63,8 @@ export class Item {
         //If the capacity is set to 0, uncap it. Otherwise cap it.
         if (this.capacities.size !== 0) newAmount = Math.min(this.capacity, newAmount)
         this.value = newAmount
-
         //When the amount changes, call the amountChange event for all listeners.
-        this.onAmountChange.trigger(new ItemEvent(this.value, this))
+        this.onAmountChange.trigger(this.value)
         return this
     }
 
@@ -79,14 +74,14 @@ export class Item {
         return this
     }
 
-    on(eventType: "amountChange" | "totalChange" | "modifierChange" | "activation", callback: ((event: ItemEvent) => void)) {
+    on(eventType: "amountChange" | "totalChange" | "modifierChange" | "activation", callback: ((value: number) => void)) {
         var eventArray = this.events.get(eventType)
         if (!eventArray) console.error(`Event type ${eventType} does not exist.`)
         else eventArray.listen(callback)
     }
 
     trigger(eventType: "amountChange" | "totalChange" | "modifierChange" | "activation") {
-        this.events.get(eventType)?.trigger(new ItemEvent(this.value, this))
+        this.events.get(eventType)?.trigger(this.value)
     }
 
     addCapacity(capItem: Item, multiplier: number = 1) {
@@ -115,9 +110,9 @@ export class ItemRef extends Item implements Total<number> {
 
             this.totalVar?.onModifierChange.listen(() => {
                 //Called when a modifier is changed
-                this.onModifierChange.trigger(new ItemEvent(this.total(), this))
+                this.onModifierChange.trigger(this.total())
                 //Call as well to update the UI and anything else needed.
-                this.onAmountChange.trigger(new ItemEvent(this.total(), this))
+                this.onAmountChange.trigger(this.total())
             })
         }
     }
@@ -135,9 +130,9 @@ export class ItemRef extends Item implements Total<number> {
 class Capacity {
     amount = 0
     constructor(public item: Item, public capItem: Item, public multiplier: number) {
-        capItem.on("amountChange", (e) => {
+        capItem.on("amountChange", (value) => {
             //Get the difference between the new and old amount
-            const changeBy = this.amount - e.newAmount * multiplier
+            const changeBy = this.amount - value * multiplier
             //Change the stored amount and the total amount.
             this.amount -= changeBy
             item.capacity -= changeBy

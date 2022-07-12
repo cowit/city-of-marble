@@ -23,7 +23,7 @@ export const territory = (items) => {
         This achievement has attracted people from from all around the region.
         Your population will now grow faster and their housing will begin to get more compact with better materials being used..`)
             .button("build", "Building more housing", conversion(`cityBuildHouse`)
-            .inputs([items.land(0.9, [modi(`housingLandCost`, -0.1)]), items.wood(5)])
+            //.inputs([items.land(0.9, [modi(`housingLandCost`, -0.1)]), items.wood(5)])
             .outputs([items.housing(1)])
             .modifier(`completions`, `cityLevel`)
             .complete())

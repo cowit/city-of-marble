@@ -1,11 +1,5 @@
 import { EventHandler } from "../components/events.js";
 import { itemIcon } from "../ui.js";
-class ItemEvent {
-    constructor(newAmount, item) {
-        this.newAmount = newAmount;
-        this.item = item;
-    }
-}
 export class Item {
     constructor(id, name, icon) {
         this.id = id;
@@ -63,7 +57,7 @@ export class Item {
             newAmount = Math.min(this.capacity, newAmount);
         this.value = newAmount;
         //When the amount changes, call the amountChange event for all listeners.
-        this.onAmountChange.trigger(new ItemEvent(this.value, this));
+        this.onAmountChange.trigger(this.value);
         return this;
     }
     add(addend) {
@@ -80,7 +74,7 @@ export class Item {
     }
     trigger(eventType) {
         var _a;
-        (_a = this.events.get(eventType)) === null || _a === void 0 ? void 0 : _a.trigger(new ItemEvent(this.value, this));
+        (_a = this.events.get(eventType)) === null || _a === void 0 ? void 0 : _a.trigger(this.value);
     }
     addCapacity(capItem, multiplier = 1) {
         this.capacities.set(capItem.id, new Capacity(this, capItem, multiplier));
@@ -108,9 +102,9 @@ export class ItemRef extends Item {
             });
             (_a = this.totalVar) === null || _a === void 0 ? void 0 : _a.onModifierChange.listen(() => {
                 //Called when a modifier is changed
-                this.onModifierChange.trigger(new ItemEvent(this.total(), this));
+                this.onModifierChange.trigger(this.total());
                 //Call as well to update the UI and anything else needed.
-                this.onAmountChange.trigger(new ItemEvent(this.total(), this));
+                this.onAmountChange.trigger(this.total());
             });
         }
     }
@@ -128,9 +122,9 @@ class Capacity {
         this.capItem = capItem;
         this.multiplier = multiplier;
         this.amount = 0;
-        capItem.on("amountChange", (e) => {
+        capItem.on("amountChange", (value) => {
             //Get the difference between the new and old amount
-            const changeBy = this.amount - e.newAmount * multiplier;
+            const changeBy = this.amount - value * multiplier;
             //Change the stored amount and the total amount.
             this.amount -= changeBy;
             item.capacity -= changeBy;

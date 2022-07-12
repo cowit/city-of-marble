@@ -22,8 +22,8 @@ export function itemIcon(item, parent, conversion) {
         tooltip.hide();
     });
     if (conversion) {
-        item.onModifierChange.listen((e) => {
-            if (e.newAmount === 0)
+        item.onModifierChange.listen((value) => {
+            if (value === 0)
                 comp.hide();
             else
                 comp.show();
@@ -39,22 +39,22 @@ export function itemIcon(item, parent, conversion) {
         }
     });
     //Subscribe to the change amount event to keep the icon updated.
-    item.on("amountChange", (e) => {
+    item.on("amountChange", (value) => {
         if (!conversion)
             comp.show();
         if (conversion && conversion.current > 0) {
-            e.newAmount *= conversion.current;
+            value *= conversion.current;
         }
-        var toShow = e.newAmount.toString();
-        if (e.newAmount % 1 !== 0 && e.newAmount !== 0 && e.newAmount < 100)
-            toShow = e.newAmount.toFixed(2);
-        else if (e.newAmount > 100)
-            toShow = Math.floor(e.newAmount).toString();
+        var toShow = value.toString();
+        if (value % 1 !== 0 && value !== 0 && value < 100)
+            toShow = value.toFixed(2);
+        else if (value > 100)
+            toShow = Math.floor(value).toString();
         amountEle.text(toShow);
         //Display the current capacity
-        if (e.item.capacity > 0) {
+        if (item.capacity > 0) {
             capacityEle.show();
-            capacityEle.text(`\\ ${Math.floor(e.item.capacity)}`);
+            capacityEle.text(`\\ ${Math.floor(item.capacity)}`);
         }
         else {
             capacityEle.hide();
@@ -64,8 +64,7 @@ export function itemIcon(item, parent, conversion) {
     if (!conversion) {
         item.on(`activation`, (e) => {
             var toShow = item.amountChange.current;
-            /*if (e.newAmount % 1 !== 0 && e.newAmount !== 0 && e.newAmount < 100)*/ toShow = toShow.toFixed(2);
-            //else if (e.newAmount > 100) toShow = Math.floor(toShow).toString()
+            toShow = toShow.toFixed(2);
             //Display the current changes
             if (item.amountChange.current > 0) {
                 currentEle.text("+" + toShow);
@@ -178,8 +177,8 @@ export class UIComponent {
                 const iconWrapper = itemIcon(inp, this, con)
                     .appendTo(comp.find(".conversion-items[inputs]"))
                     .addClass("negative");
-                inp.on("modifierChange", (e) => {
-                    iconWrapper.find('.conversion-amount').text(e.newAmount);
+                inp.on("modifierChange", (value) => {
+                    iconWrapper.find('.conversion-amount').text(value);
                 });
                 if (inp.total() === 0)
                     iconWrapper.hide();
@@ -202,8 +201,8 @@ export class UIComponent {
                 const iconWrapper = itemIcon(out, this, con)
                     .appendTo(comp.find(".conversion-items[outputs]"))
                     .addClass("positive");
-                out.on("modifierChange", (e) => {
-                    iconWrapper.find('.conversion-amount').text(e.newAmount);
+                out.on("modifierChange", (value) => {
+                    iconWrapper.find('.conversion-amount').text(value);
                 });
                 if (out.total() === 0)
                     iconWrapper.hide();

@@ -10,7 +10,7 @@ export class ConversionArguments {
         this._inputs = [];
         this._outputs = [];
         this._modifierSelectors = [];
-        this._amount = { total() { return this.value; }, value: 0 };
+        this._amount = { total() { return this.value; }, value: 0, onAmountChange: new EventHandler() };
         this._displayButtons = true;
     }
     inputs(inputs) {
@@ -30,7 +30,7 @@ export class ConversionArguments {
         return this;
     }
     amount(baseValue = 0, modifier) {
-        this._amount = { total() { return this.value; }, value: baseValue };
+        this._amount = { total() { return this.value; }, value: baseValue, onAmountChange: this._amount.onAmountChange };
         if (modifier) {
             if (Array.isArray(modifier)) {
                 var modVar;
@@ -49,8 +49,10 @@ export class ConversionArguments {
             }
             else {
                 this._amount.value = modifier.value;
+                this._amount.onAmountChange.trigger(modifier.value);
                 modifier.onAmountChange.listen((value) => {
-                    this._amount.value = Math.floor(value.newAmount);
+                    this._amount.value = Math.floor(value);
+                    this._amount.onAmountChange.trigger(value);
                 });
             }
         }
@@ -92,6 +94,9 @@ export class Conversion {
         this.completions = 0;
         this.onAmountChange = new EventHandler();
         this.build(this.amount.total());
+        this.amount.onAmountChange.listen((value) => {
+            this.onAmountChange.trigger(this);
+        });
     }
     checkConversion(complete) {
         //The maximum amount of conversion activations that can happen.

@@ -59,13 +59,13 @@ export class UnlockCondition {
 }
 
 export class ModuleArguments {
-    public _id?: string
-    public _name?: string
-    public _conversions: Conversion[] = []
+    private _id?: string
+    private _name?: string
+    private _conversions: Conversion[] = []
     private _buttons: ModuleButton[] = []
     private _description: string = ""
-    public _unlockConditions: UnlockCondition[] = []
-    public _lockIDs: string[] = []
+    private _unlockConditions: UnlockCondition[] = []
+    private _lockIDs: string[] = []
     id(id: string) {
         this._id = id
         return this

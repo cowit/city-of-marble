@@ -13,6 +13,7 @@ export class ModifiableVariable {
         this.value = 0;
         this.totalNumber = 0;
         this.onModifierChange = new EventHandler();
+        this.onAmountChange = this.onModifierChange;
         this.value = original;
         if (typeof original === "number")
             this.totalNumber = original;

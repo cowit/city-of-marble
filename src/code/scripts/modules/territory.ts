@@ -32,7 +32,7 @@ export const territory = (items: Items) => {
         Your population will now grow faster and their housing will begin to get more compact with better materials being used..`)
                 .button("build", "Building more housing",
                     conversion(`cityBuildHouse`)
-                        //.inputs([items.land(0.9, [modi(`housingLandCost`, -0.1)]), items.wood(5)])
+                        .inputs([items.land(0.9, [modi(`housingLandCost`, -0.1)]), items.wood(5)])
                         .outputs([items.housing(1)])
                         .modifier(`completions`, `cityLevel`)
                         .complete()
@@ -79,7 +79,7 @@ export const territory = (items: Items) => {
                         .hideButtons()
                         .complete(),
                     conversion(`popGrowthWorkForce`)
-                        .inputs([items.food(0.5, [modi(`civineBlessing`, -0.01)])])
+                        .inputs([items.food(0.5)])
                         .outputs([items.labor(0.5)])
                         .amount(1, items.population())
                         .complete()

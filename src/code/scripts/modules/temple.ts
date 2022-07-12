@@ -50,7 +50,7 @@ export const temple = (items: Items) => {
                         .complete()
                 )
                 .button("lock", `Dedicate to Civine
-                 Your citizens will prosper in abundant housing and food.`,
+                 Your citizens will prosper in abundant housing.`,
                     conversion(`civine`)
                         .inputs([items.population(10)])
                         .modifier(3, `templeGod`)
